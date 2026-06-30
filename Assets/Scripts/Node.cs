@@ -1,14 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
+
+[System.Serializable]
+public class NodeDirection
+{
+    public Node node;
+    public char direction;
+}
 
 public class Node : MonoBehaviour
 {
-    void Start()
-    {
+    [SerializeField] private List<NodeDirection> nodes;
+    [SerializeField] private string id;
 
-    }
-
-    void Update()
-    {
-
-    }
+    public string ID => id;
+    public List<NodeDirection> Nodes => nodes;
 }
