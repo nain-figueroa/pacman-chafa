@@ -6,23 +6,24 @@ using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-enum State
+public enum State
 {
-    Up, Down, Left, Right
+    Up, Down, Left, Right, Idle
 }
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private float speed;
     [SerializeField] private Collider2D directionCollider;
-    private Rigidbody2D rg;
-    private State state;
-    private Node node;
-    private Dictionary<char, State> charToState = new Dictionary<char, State>
+    
+    private Rigidbody2D _rigidbody;
+    private State _state;
+    private Node _node;
+    private Dictionary<char, State> _charToState = new Dictionary<char, State>
     {
       {'L', State.Left}, {'R', State.Right}, {'D', State.Down}, {'U', State.Up}
     };
-    private bool isInsideNode;
+    private bool _isInsideNode;
 
     /*
         ==========================
@@ -31,10 +32,10 @@ public class Player : MonoBehaviour
     */
     void Start()
     {
-        rg = GetComponent<Rigidbody2D>();
+        _rigidbody = GetComponent<Rigidbody2D>();
 
-        state = State.Left;
-        isInsideNode = false;
+        _state = State.Left;
+        _isInsideNode = false;
     }
 
     void Update()
@@ -43,13 +44,13 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        PlayerMovement(state);
+        PlayerMovement(_state);
 
-        if (node != null)
+        if (_node != null)
         {
-            if (isCompletelyInside(node.GetComponent<Collider2D>()))
+            if (isCompletelyInside(_node.GetComponent<Collider2D>()))
             {
-                isInsideNode = true;
+                _isInsideNode = true;
             }
         }
     }
@@ -58,7 +59,7 @@ public class Player : MonoBehaviour
     {
         if (collision.CompareTag("Node"))
         {
-            node = collision.GetComponent<Node>();
+            _node = collision.GetComponent<Node>();
         }
         else if (collision.CompareTag("Teleport"))
         {
@@ -71,8 +72,8 @@ public class Player : MonoBehaviour
     {
         if (collision.CompareTag("Node"))
         {
-            node = null;
-            isInsideNode = false;
+            _node = null;
+            _isInsideNode = false;
         }
     }
 
@@ -116,21 +117,21 @@ public class Player : MonoBehaviour
     {
         bool isDirectionAvailable = false;
 
-        foreach (NodeDirection node in this.node.Nodes)
+        foreach (NodeDirection node in this._node.Nodes)
         {
-            if (charToState[node.direction] == stateToChange)
+            if (_charToState[node.direction] == stateToChange)
             {
                 isDirectionAvailable = true;
 
                 switch (stateToChange)
                 {
-                    case State.Down when isInsideNode:
-                    case State.Up when isInsideNode:
-                        transform.position = new Vector3(this.node.transform.position.x, transform.position.y, 0);
+                    case State.Down when _isInsideNode:
+                    case State.Up when _isInsideNode:
+                        transform.position = new Vector3(this._node.transform.position.x, transform.position.y, 0);
                         break;
-                    case State.Left when isInsideNode:
-                    case State.Right when isInsideNode:
-                        transform.position = new Vector3(transform.position.x, this.node.transform.position.y, 0);
+                    case State.Left when _isInsideNode:
+                    case State.Right when _isInsideNode:
+                        transform.position = new Vector3(transform.position.x, this._node.transform.position.y, 0);
                         break;
                 }
                 break;
@@ -147,17 +148,17 @@ public class Player : MonoBehaviour
 
         if (Keyboard.current.dKey.isPressed)
         {
-            state = State.Right;
+            _state = State.Right;
         }
-        else if (isInsideNode)
+        else if (_isInsideNode)
         {
             if (Keyboard.current.wKey.isPressed)
             {
-                state = ChangeDirection(State.Up, State.Left);
+                _state = ChangeDirection(State.Up, State.Left);
             }
             else if (Keyboard.current.sKey.isPressed)
             {
-                state = ChangeDirection(State.Down, State.Left);
+                _state = ChangeDirection(State.Down, State.Left);
             }
         }
     }
@@ -168,17 +169,17 @@ public class Player : MonoBehaviour
 
         if (Keyboard.current.aKey.isPressed)
         {
-            state = State.Left;
+            _state = State.Left;
         }
-        else if (isInsideNode)
+        else if (_isInsideNode)
         {
             if (Keyboard.current.wKey.isPressed)
             {
-                state = ChangeDirection(State.Up, State.Right);
+                _state = ChangeDirection(State.Up, State.Right);
             }
             else if (Keyboard.current.sKey.isPressed)
             {
-                state = ChangeDirection(State.Down, State.Right);
+                _state = ChangeDirection(State.Down, State.Right);
             }
         }
     }
@@ -189,17 +190,17 @@ public class Player : MonoBehaviour
 
         if (Keyboard.current.sKey.isPressed)
         {
-            state = State.Down;
+            _state = State.Down;
         }
-        else if (isInsideNode)
+        else if (_isInsideNode)
         {
             if (Keyboard.current.dKey.isPressed)
             {
-                state = ChangeDirection(State.Right, State.Up);
+                _state = ChangeDirection(State.Right, State.Up);
             }
             else if (Keyboard.current.aKey.isPressed)
             {
-                state = ChangeDirection(State.Left, State.Up);
+                _state = ChangeDirection(State.Left, State.Up);
             }
         }
     }
@@ -210,17 +211,17 @@ public class Player : MonoBehaviour
 
         if (Keyboard.current.wKey.isPressed)
         {
-            state = State.Up;
+            _state = State.Up;
         }
-        else if (isInsideNode)
+        else if (_isInsideNode)
         {
             if (Keyboard.current.dKey.isPressed)
             {
-                state = ChangeDirection(State.Right, State.Down);
+                _state = ChangeDirection(State.Right, State.Down);
             }
             else if (Keyboard.current.aKey.isPressed)
             {
-                state = ChangeDirection(State.Left, State.Down);
+                _state = ChangeDirection(State.Left, State.Down);
             }
         }
     }
@@ -228,7 +229,7 @@ public class Player : MonoBehaviour
 
     private void Move(Vector2 direction)
     {
-        rg.MovePosition(rg.position + direction * speed * Time.fixedDeltaTime);
+        _rigidbody.MovePosition(_rigidbody.position + direction * speed * Time.fixedDeltaTime);
     }
     #endregion PlayerMovement
 }

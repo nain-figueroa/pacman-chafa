@@ -7405,11 +7405,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1134662788467692893, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.498
+      value: -10.44
       objectReference: {fileID: 0}
     - target: {fileID: 1134662788467692893, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.498
+      value: -5.44
       objectReference: {fileID: 0}
     - target: {fileID: 1134662788467692893, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: m_LocalPosition.z
@@ -7447,10 +7447,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ghost
       objectReference: {fileID: 0}
-    - target: {fileID: 6430499972763528213, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: m_GravityScale
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: n1
       value: 
@@ -7459,18 +7455,6 @@ PrefabInstance:
       propertyPath: n2
       value: 
       objectReference: {fileID: 1367774064}
-    - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: startNode
-      value: 
-      objectReference: {fileID: 1254126400}
-    - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: destinyNode
-      value: 
-      objectReference: {fileID: 1367774064}
-    - target: {fileID: 9138452161788759787, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
