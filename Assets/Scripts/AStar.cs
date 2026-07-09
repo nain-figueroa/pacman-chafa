@@ -11,7 +11,7 @@ public class AStar
 {
     private List<Node> _open = new();
     private List<Node> _close = new();
-
+    
     public List<Node> FindPath(Node startNode, Node finishNode)
     {
         startNode.ModifyLabel(0.0f, (Math.Abs(startNode.transform.position.x - finishNode.transform.position.x) + Math.Abs(startNode.transform.position.y - finishNode.transform.position.y)), null);
@@ -55,5 +55,11 @@ public class AStar
         }
 
         return bestPath;
+    }
+
+    public void ClearData()
+    {
+        _open.Clear();
+        _close.Clear();
     }
 }

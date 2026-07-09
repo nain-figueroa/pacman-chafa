@@ -1,8 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using Unity.VisualScripting;
-using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,7 +14,7 @@ public class Player : MonoBehaviour
     
     private Rigidbody2D _rigidbody;
     private State _state;
-    private Node _node;
+    private Node _node, _lastNode;
     private Dictionary<char, State> _charToState = new Dictionary<char, State>
     {
       {'L', State.Left}, {'R', State.Right}, {'D', State.Down}, {'U', State.Up}
@@ -60,6 +56,7 @@ public class Player : MonoBehaviour
         if (collision.CompareTag("Node"))
         {
             _node = collision.GetComponent<Node>();
+            _lastNode = _node;
         }
         else if (collision.CompareTag("Teleport"))
         {
@@ -82,6 +79,9 @@ public class Player : MonoBehaviour
         ||  Métodos y funciones definidas por el usuario    ||
         ======================================================
     */
+
+    public Node LastNode => _lastNode;
+    public State State => _state;
     private bool isCompletelyInside(Collider2D node)
     {
         Bounds nodeBounds = node.bounds;

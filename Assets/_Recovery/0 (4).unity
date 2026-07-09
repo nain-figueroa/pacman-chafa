@@ -1109,16 +1109,12 @@ PrefabInstance:
       value: 67
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: speed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: pacman
       value: 
       objectReference: {fileID: 9095649842318659466}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode
@@ -2697,16 +2693,12 @@ PrefabInstance:
       value: 66
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: speed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: pacman
       value: 
       objectReference: {fileID: 9095649842318659466}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode
@@ -5543,16 +5535,12 @@ PrefabInstance:
       value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: speed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: pacman
       value: 
       objectReference: {fileID: 9095649842318659466}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode
@@ -8026,10 +8014,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1615553729}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
-      propertyPath: speed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: blinky
       value: 
       objectReference: {fileID: 613422582}
@@ -8043,7 +8027,7 @@ PrefabInstance:
       objectReference: {fileID: 1254126400}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode

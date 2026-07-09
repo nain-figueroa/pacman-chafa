@@ -1,39 +1,50 @@
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.VersionControl;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 /*
  *
- *  Recuerda cambiar que node queda como actual node al iniciar ya con los fantasmas bien
+ *  CUANDO LLEGUEN AL NODO QUE ESTÁ AL LADO DEL TELEPORT, QUE SIGAN DE LARGO, QUE SE TELETRANSPORTEN
+ *  EN CASO DE QUE ASÍ SEA NECESARIO
  * 
  */
 
 public class Ghost : MonoBehaviour
 {
-    [SerializeField] private float speed = 4.0f;
-    [SerializeField] private Node startNode;
+    [SerializeField] private float speed = 2.5f;
+    [SerializeField] private char id; //B: Blinky, P: Pinky, I: Inky, C: Clyde
+    [SerializeField] private float idleTime;
+    [SerializeField] private Node firstNode;
     [SerializeField] private Node destinyNode;
+    [SerializeField] private Player pacman;
+    [SerializeField] private Collider2D collider2D;
+    [SerializeField] private GameObject nodes;
+    [SerializeField] private Ghost blinky = null;
+    [SerializeField] private List<Node> cornerNodes;
     
     private Rigidbody2D _rigidbody;
-    private Collider2D _collider;
     
     private List<Node> _path;
     private AStar _aStar;
     private Node _actualNode;
-    private bool _pathComplete;
-    private Vector2 _lastDirection;
+    private Vector2 _horizontalMov;
+    private bool _idleState;
+
+    #region UnityMethods
     void Start()
     {
         _aStar = new AStar();
 
         _rigidbody = GetComponent<Rigidbody2D>();
-        _collider = GetComponent<Collider2D>();
-        _actualNode = startNode;
-        _pathComplete = false;
-        _lastDirection = Vector2.zero;
         
-        CreatePath();
+        _actualNode = firstNode;
+        CreatePath(firstNode, destinyNode);
+
+        _horizontalMov = Vector2.left;
+        _idleState = true;
+
+        StartCoroutine(Timer(idleTime));
     }
     void Update()
     {
@@ -42,80 +53,149 @@ public class Ghost : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!_pathComplete) GoToDestiny();
-        if (transform.position == destinyNode.transform.position) _pathComplete = true;
+        if (_idleState)
+        {
+            IdleState();
+            return;
+        }
+        GoToDestiny();
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.CompareTag("Node"))
+        if (other.gameObject.CompareTag("Wall"))
         {
-            Node node =  other.GetComponent<Node>();
-            
-            _actualNode = node;
-            
-            // Debug.Log(_actualNode);
+            if (_idleState) _horizontalMov *= -1;
         }
     }
 
-    private void CreatePath()
+    #endregion
+
+    public Node ActualNode => _actualNode;
+    
+    private IEnumerator<WaitForSeconds> Timer(float time)
     {
-        _path = _aStar.FindPath(startNode, destinyNode);
+        yield return new WaitForSeconds(time);
+        _idleState = false;
+        transform.position = firstNode.transform.position;
+    }
+    #region GhostMovement
+    private void CreatePath(Node start, Node finish)
+    {
+        if (start == finish)
+            return;
+        
+        _aStar.ClearData();
+        _path = _aStar.FindPath(start, finish);
+        
+        if (_path == null || _path.Count == 0)
+            return;
+        
         _path.Reverse();
-        _path.Remove(startNode);
+        _path.Remove(start);
     }
 
     private void GoToDestiny()
     {
-        // float distance = Vector2.Distance(_rigidbody.position, (Vector2)_path[0].transform.position);
-        if (_actualNode.ID != _path[0].ID)
+        Vector2 target = _path[0].transform.position;
+        
+        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
+        
+        if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
         {
-            Vector2 direction = ObtainDirection(_path[0]);
-            _rigidbody.MovePosition(_rigidbody.position + direction * speed * Time.fixedDeltaTime);
-            _lastDirection = new Vector2(direction.x, direction.y);
-        }
-        else
-        {
-            // _rigidbody.MovePosition(_path[0].transform.position * Time.fixedDeltaTime);
-            if (IsCompletelyInside(_path[0].GetComponent<Collider2D>()))
-            {
-                transform.position = _path[0].transform.position;
-                _path.RemoveAt(0);
-            }
-            else
-            {
-                _rigidbody.MovePosition(_rigidbody.position + _lastDirection * speed * Time.fixedDeltaTime);
-            }
+            transform.position = _path[0].transform.position;
+            _actualNode = _path[0];
+            CreatePath(_actualNode, GetDestinyNode());
         }
     }
 
-    private Vector2 ObtainDirection(Node destinyNode)
+    private void IdleState()
     {
-        char direction = ' ';
-        foreach (NodeDirection nodeDir in _actualNode.Nodes)
+        _rigidbody.MovePosition(_rigidbody.position + _horizontalMov * speed * Time.fixedDeltaTime);
+    }
+
+    private Node GetDestinyNode()
+    {
+        switch (id)
         {
-            if (nodeDir.node.ID == destinyNode.ID)
+            case 'B':
+                return pacman.LastNode;
+            case 'P':
             {
-                direction = nodeDir.direction;
-                break;
+                char pacmanDirection = pacman.State switch
+                {
+                    State.Down => 'D',
+                    State.Up => 'U',
+                    State.Left => 'L',
+                    State.Right => 'R',
+                    _ => ' '
+                };
+
+                Node destiny = pacman.LastNode;
+                Node oldDestiny = destiny;
+                for (int i = 1; i <= 4; i++)
+                {
+                    foreach (NodeDirection nodeDirs in destiny.Nodes)
+                    {
+                        if (nodeDirs.direction == pacmanDirection)
+                        {
+                            destiny = nodeDirs.node;
+                            break;
+                        }
+                    }
+
+                    if (destiny == oldDestiny) break;
+                    oldDestiny = destiny;
+                }
+                return destiny;
+            }
+            case 'I':
+            {
+                Vector2 pacmanPosition = pacman.LastNode.transform.position;
+                Vector2 blinkyPosition = blinky.ActualNode.transform.position;
+                
+                Vector2 pacmanDirection = pacman.State switch
+                {
+                    State.Down => Vector2.down,
+                    State.Up => Vector2.up,
+                    State.Left => Vector2.left,
+                    State.Right => Vector2.right,
+                    _ => Vector2.zero
+                };
+
+                Vector2 temp = pacmanPosition + pacmanDirection * 2;
+                Vector2 destinyPosition = blinkyPosition + (temp - blinkyPosition) * 2;
+
+                Node[] nodes = this.nodes.GetComponentsInChildren<Node>();
+
+                Node bestNode = null;
+                float bestDistance = float.MaxValue;
+
+                foreach (Node node in nodes)
+                {
+                    float distance = Vector2.Distance(node.transform.position, destinyPosition);
+                    if (distance < bestDistance)
+                    {
+                        bestDistance = distance;
+                        bestNode = node;
+                    }
+                }
+                Debug.Log($"Inky Nodo: {bestNode}");
+                return bestNode;
+            }
+            case 'C':
+            {
+                float distance = Vector2.Distance(pacman.transform.position, transform.position);
+
+                if (distance > 8f)
+                {
+                    return pacman.LastNode;
+                }
+                return cornerNodes[Random.Range(0,3)];
             }
         }
 
-        return direction switch
-        {
-            'U' => Vector2.up,
-            'D' => Vector2.down,
-            'L' => Vector2.left,
-            'R' => Vector2.right,
-            _ => Vector2.zero
-        };
+        return null;
     }
-    
-    private bool IsCompletelyInside(Collider2D node)
-    {
-        Bounds nodeBounds = node.bounds;
-        Bounds ghostBounds = _collider.bounds;
-
-        return nodeBounds.Contains(ghostBounds.min) && nodeBounds.Contains(ghostBounds.max);
-    }
+    #endregion
 }
