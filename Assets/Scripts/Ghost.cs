@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
  *
  *  CUANDO LLEGUEN AL NODO QUE ESTÁ AL LADO DEL TELEPORT, QUE SIGAN DE LARGO, QUE SE TELETRANSPORTEN
  *  EN CASO DE QUE ASÍ SEA NECESARIO
- * 
+ *  LOS FANTASMAS DEBEN DE SALIR DE ACUERDO A CUANTOS PUNTOS TENGA PACMAN
  */
 
 public class Ghost : MonoBehaviour
@@ -22,6 +22,7 @@ public class Ghost : MonoBehaviour
     [SerializeField] private GameObject nodes;
     [SerializeField] private Ghost blinky = null;
     [SerializeField] private List<Node> cornerNodes;
+    [SerializeField] private SpriteRenderer spriteRenderer;
     
     private Rigidbody2D _rigidbody;
     
@@ -34,6 +35,21 @@ public class Ghost : MonoBehaviour
     #region UnityMethods
     void Start()
     {
+        switch (id)
+        {
+            case 'B':
+                spriteRenderer.color = Color.red;
+                break;
+            case 'P':
+                spriteRenderer.color = Color.magenta;
+                break;
+            case 'I':
+                spriteRenderer.color = Color.cyan;
+                break;
+            case 'C':
+                spriteRenderer.color = Color.orange;
+                break;
+        }
         _aStar = new AStar();
 
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -180,7 +196,6 @@ public class Ghost : MonoBehaviour
                         bestNode = node;
                     }
                 }
-                Debug.Log($"Inky Nodo: {bestNode}");
                 return bestNode;
             }
             case 'C':

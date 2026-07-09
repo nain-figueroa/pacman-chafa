@@ -1104,6 +1104,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Clyde
       objectReference: {fileID: 0}
+    - target: {fileID: 6034053948412919005, guid: 178000970207b2567844f7b39f0a16de, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: id
       value: 67
@@ -1118,7 +1122,7 @@ PrefabInstance:
       objectReference: {fileID: 9095649842318659466}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 2
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode
@@ -2692,6 +2696,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Blinky
       objectReference: {fileID: 0}
+    - target: {fileID: 6034053948412919005, guid: 178000970207b2567844f7b39f0a16de, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: id
       value: 66
@@ -2706,7 +2714,7 @@ PrefabInstance:
       objectReference: {fileID: 9095649842318659466}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode
@@ -5538,6 +5546,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pinky
       objectReference: {fileID: 0}
+    - target: {fileID: 6034053948412919005, guid: 178000970207b2567844f7b39f0a16de, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: id
       value: 80
@@ -8005,6 +8017,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Inky
       objectReference: {fileID: 0}
+    - target: {fileID: 6034053948412919005, guid: 178000970207b2567844f7b39f0a16de, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6430499972763528213, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: m_GravityScale
       value: 0
@@ -8043,7 +8059,7 @@ PrefabInstance:
       objectReference: {fileID: 1254126400}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: idleTime
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7844833375681742595, guid: 178000970207b2567844f7b39f0a16de, type: 3}
       propertyPath: firstNode

@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public enum State
 {
@@ -11,8 +14,11 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float speed;
     [SerializeField] private Collider2D directionCollider;
+    [SerializeField] private GameObject skin;
     
     private Rigidbody2D _rigidbody;
+    private Transform _spriteTransform;
+    private SpriteRenderer _spriteRenderer;
     private State _state;
     private Node _node, _lastNode;
     private Dictionary<char, State> _charToState = new Dictionary<char, State>
@@ -28,10 +34,13 @@ public class Player : MonoBehaviour
     */
     void Start()
     {
+        Time.timeScale = 1f;
         _rigidbody = GetComponent<Rigidbody2D>();
 
         _state = State.Left;
         _isInsideNode = false;
+        _spriteRenderer = skin.GetComponent<SpriteRenderer>();
+        _spriteTransform = skin.GetComponent<Transform>();
     }
 
     void Update()
@@ -74,6 +83,16 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ghost"))
+        {
+            Time.timeScale = 0;
+            Timer(2f);
+            SceneManager.LoadScene("GameOver");
+        }
+    }
+
     /*
         ======================================================
         ||  Métodos y funciones definidas por el usuario    ||
@@ -88,6 +107,11 @@ public class Player : MonoBehaviour
         Bounds playerBounds = directionCollider.bounds;
 
         return nodeBounds.Contains(playerBounds.min) && nodeBounds.Contains(playerBounds.max);
+    }
+
+    private IEnumerator<WaitForSeconds> Timer(float time)
+    {
+        yield return new WaitForSeconds(time);
     }
 
     #region PlayerMovement
@@ -144,6 +168,8 @@ public class Player : MonoBehaviour
     }
     private void MoveToLeft()
     {
+        _spriteRenderer.flipX = true;
+        _spriteTransform.localRotation = Quaternion.Euler(0,0,0);
         Move(Vector2.left);
 
         if (Keyboard.current.dKey.isPressed)
@@ -165,6 +191,8 @@ public class Player : MonoBehaviour
 
     private void MoveToRight()
     {
+        _spriteRenderer.flipX = false;
+        _spriteTransform.localRotation = Quaternion.Euler(0,0,0);
         Move(Vector2.right);
 
         if (Keyboard.current.aKey.isPressed)
@@ -186,6 +214,8 @@ public class Player : MonoBehaviour
 
     private void MoveToUp()
     {
+        _spriteRenderer.flipX = false;
+        _spriteTransform.localRotation = Quaternion.Euler(0,0,90);
         Move(Vector2.up);
 
         if (Keyboard.current.sKey.isPressed)
@@ -207,6 +237,8 @@ public class Player : MonoBehaviour
 
     private void MoveToDown()
     {
+        _spriteRenderer.flipX = false;
+        _spriteTransform.localRotation = Quaternion.Euler(0,0,270);
         Move(Vector2.down);
 
         if (Keyboard.current.wKey.isPressed)
