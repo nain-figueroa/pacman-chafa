@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public enum State
 {
-    Up, Down, Left, Right, Idle
+    Up, Down, Left, Right
 }
 
 public class Player : MonoBehaviour
@@ -26,6 +26,8 @@ public class Player : MonoBehaviour
       {'L', State.Left}, {'R', State.Right}, {'D', State.Down}, {'U', State.Up}
     };
     private bool _isInsideNode;
+    private int _score;
+    private bool _superPacman;
 
     /*
         ==========================
@@ -41,6 +43,8 @@ public class Player : MonoBehaviour
         _isInsideNode = false;
         _spriteRenderer = skin.GetComponent<SpriteRenderer>();
         _spriteTransform = skin.GetComponent<Transform>();
+        _score = 0;
+        _superPacman = false;
     }
 
     void Update()
@@ -72,6 +76,17 @@ public class Player : MonoBehaviour
             Teleport teleport = collision.GetComponent<Teleport>();
             transform.position = teleport.OtherTelepor.transform.position;
         }
+        else if (collision.CompareTag("Point"))
+        {
+            Point point = collision.GetComponent<Point>();
+            if (point.SuperPoint)
+            {
+                _superPacman = true;
+                StartCoroutine(SuperPacmanMode());
+            }
+            point.gameObject.SetActive(false);
+            _score += point.Value;
+        }
     }
 
     void OnTriggerExit2D(Collider2D collision)
@@ -85,7 +100,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Ghost"))
+        if (other.gameObject.CompareTag("Ghost") && !_superPacman)
         {
             Time.timeScale = 0;
             Timer(2f);
@@ -101,6 +116,8 @@ public class Player : MonoBehaviour
 
     public Node LastNode => _lastNode;
     public State State => _state;
+    public int Score => _score;
+    public bool SuperPacman => _superPacman;
     private bool isCompletelyInside(Collider2D node)
     {
         Bounds nodeBounds = node.bounds;
@@ -109,9 +126,15 @@ public class Player : MonoBehaviour
         return nodeBounds.Contains(playerBounds.min) && nodeBounds.Contains(playerBounds.max);
     }
 
-    private IEnumerator<WaitForSeconds> Timer(float time)
+    private IEnumerator Timer(float time)
     {
         yield return new WaitForSeconds(time);
+    }
+
+    private IEnumerator SuperPacmanMode()
+    {
+        yield return Timer(5.0f);
+        _superPacman = false;
     }
 
     #region PlayerMovement

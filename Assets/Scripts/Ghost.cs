@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -15,6 +15,7 @@ public class Ghost : MonoBehaviour
     [SerializeField] private float speed = 2.5f;
     [SerializeField] private char id; //B: Blinky, P: Pinky, I: Inky, C: Clyde
     [SerializeField] private float idleTime;
+    [SerializeField] private float scaredTime = 5.0f;
     [SerializeField] private Node firstNode;
     [SerializeField] private Node destinyNode;
     [SerializeField] private Player pacman;
@@ -28,12 +29,86 @@ public class Ghost : MonoBehaviour
     
     private List<Node> _path;
     private AStar _aStar;
-    private Node _actualNode;
+    private Node _actualNode, _randomNode;
     private Vector2 _horizontalMov;
-    private bool _idleState;
+    private bool _idleState, _scaredMode, _dead;
 
     #region UnityMethods
     void Start()
+    {
+        NormalGhostColor();
+        _aStar = new AStar();
+
+        _rigidbody = GetComponent<Rigidbody2D>();
+        
+        _actualNode = firstNode;
+        CreatePath(firstNode, destinyNode);
+
+        _horizontalMov = Vector2.left;
+        _idleState = true;
+        _scaredMode = false;
+        _dead = false;
+
+        StartCoroutine(IdleMode());
+    }
+    void Update()
+    {
+
+    }
+
+    void FixedUpdate()
+    {
+        if (_idleState)
+        {
+            IdleState();
+            return;
+        }
+
+        if (_scaredMode)
+        {
+            MoveRandomly();
+            return;
+        }
+
+        if (_dead)
+        {
+            GoToStart();
+            return;
+        }
+        GoToDestiny();
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Wall"))
+        {
+            if (_idleState) _horizontalMov *= -1;
+        }
+        else if (other.gameObject.CompareTag("Player"))
+        {
+            if (_scaredMode)
+            {
+                spriteRenderer.color = Color.white;
+                CreatePath(_actualNode, firstNode);
+            }
+        }
+    }
+
+    #endregion
+
+    public Node ActualNode => _actualNode;
+    public bool ScaredMode => _scaredMode;
+
+    public void SetScaredMode(bool value)
+    {
+        _scaredMode = value;
+        
+        _randomNode = _actualNode.Nodes[Random.Range(0,(_actualNode.Nodes.Count - 1))].node;
+        spriteRenderer.color = Color.blue;
+        StartCoroutine(ScaredModeTimer());
+    }
+
+    public void NormalGhostColor()
     {
         switch (id)
         {
@@ -50,50 +125,25 @@ public class Ghost : MonoBehaviour
                 spriteRenderer.color = Color.orange;
                 break;
         }
-        _aStar = new AStar();
-
-        _rigidbody = GetComponent<Rigidbody2D>();
-        
-        _actualNode = firstNode;
-        CreatePath(firstNode, destinyNode);
-
-        _horizontalMov = Vector2.left;
-        _idleState = true;
-
-        StartCoroutine(Timer(idleTime));
     }
-    void Update()
-    {
-
-    }
-
-    void FixedUpdate()
-    {
-        if (_idleState)
-        {
-            IdleState();
-            return;
-        }
-        GoToDestiny();
-    }
-
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (other.gameObject.CompareTag("Wall"))
-        {
-            if (_idleState) _horizontalMov *= -1;
-        }
-    }
-
-    #endregion
-
-    public Node ActualNode => _actualNode;
     
-    private IEnumerator<WaitForSeconds> Timer(float time)
+    private IEnumerator Timer(float time)
     {
         yield return new WaitForSeconds(time);
+    }
+
+    private IEnumerator IdleMode()
+    {
+        yield return Timer(idleTime);
         _idleState = false;
         transform.position = firstNode.transform.position;
+    }
+
+    private IEnumerator ScaredModeTimer()
+    {
+        yield return Timer(scaredTime);
+        _scaredMode = false;
+        NormalGhostColor();
     }
     #region GhostMovement
     private void CreatePath(Node start, Node finish)
@@ -130,6 +180,38 @@ public class Ghost : MonoBehaviour
         _rigidbody.MovePosition(_rigidbody.position + _horizontalMov * speed * Time.fixedDeltaTime);
     }
 
+    private void MoveRandomly()
+    {
+        Vector2 target = _randomNode.transform.position;
+        
+        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
+        
+        if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
+        {
+            transform.position = _randomNode.transform.position;
+            _randomNode = _randomNode.Nodes[Random.Range(0,(_randomNode.Nodes.Count - 1))].node;
+        }
+    }
+
+    private void GoToStart()
+    {
+        Vector2 target = _path[0].transform.position;
+        
+        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
+        
+        if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
+        {
+            transform.position = _path[0].transform.position;
+            _actualNode = _path[0];
+            _path.RemoveAt(0);
+        }
+
+        if (_actualNode == firstNode)
+        {
+            _idleState = true;
+            StartCoroutine(IdleMode());
+        }
+    }
     private Node GetDestinyNode()
     {
         switch (id)
@@ -212,5 +294,6 @@ public class Ghost : MonoBehaviour
 
         return null;
     }
+    
     #endregion
 }
