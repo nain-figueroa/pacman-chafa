@@ -61,5 +61,6 @@ public class AStar
     {
         _open.Clear();
         _close.Clear();
+        
     }
 }

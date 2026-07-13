@@ -1,115 +1,152 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 /*
- *
- *  CUANDO LLEGUEN AL NODO QUE ESTÁ AL LADO DEL TELEPORT, QUE SIGAN DE LARGO, QUE SE TELETRANSPORTEN
- *  EN CASO DE QUE ASÍ SEA NECESARIO
- *  LOS FANTASMAS DEBEN DE SALIR DE ACUERDO A CUANTOS PUNTOS TENGA PACMAN
+ *  Ahora queda ver el tema de los cambios de sprites entre modos
  */
+public enum GhostState
+{
+    Idle, Chase, Scatter, Frightened, Eaten
+}
 
 public class Ghost : MonoBehaviour
 {
-    [SerializeField] private float speed = 2.5f;
-    [SerializeField] private char id; //B: Blinky, P: Pinky, I: Inky, C: Clyde
-    [SerializeField] private float idleTime;
-    [SerializeField] private float scaredTime = 5.0f;
-    [SerializeField] private Node firstNode;
-    [SerializeField] private Node destinyNode;
+    [SerializeField] private Node startNode, destinyNode;
+    [SerializeField] private char id;
     [SerializeField] private Player pacman;
-    [SerializeField] private Collider2D collider2D;
     [SerializeField] private GameObject nodes;
     [SerializeField] private Ghost blinky = null;
-    [SerializeField] private List<Node> cornerNodes;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    
+    [SerializeField] private List<Node> cornerNodes;
+
     private Rigidbody2D _rigidbody;
-    
-    private List<Node> _path;
-    private AStar _aStar;
-    private Node _actualNode, _randomNode;
+    private Collider2D _physicCollider;
+        
+    private AStar _aStar = new AStar();
+    private List<Node> _path = new();
+    private GhostState _state = GhostState.Idle;
+    private Node _actualNode;
     private Vector2 _horizontalMov;
-    private bool _idleState, _scaredMode, _dead;
+    private float _idleTime, _speed;
+    private const float NORMAL_SPEED = 3f;
 
     #region UnityMethods
     void Start()
     {
-        NormalGhostColor();
-        _aStar = new AStar();
-
-        _rigidbody = GetComponent<Rigidbody2D>();
+        _idleTime = id switch
+        {
+            'B' => 0f,
+            'P' => 1f,
+            'I' => 3f,
+            'C' => 6f
+        };
+        _speed = NORMAL_SPEED;
         
-        _actualNode = firstNode;
-        CreatePath(firstNode, destinyNode);
+        GoToNormalSkin();
+        _state = GhostState.Idle;
+        StartCoroutine(IdleState());
+        
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _physicCollider = GetComponent<Collider2D>();
 
         _horizontalMov = Vector2.left;
-        _idleState = true;
-        _scaredMode = false;
-        _dead = false;
-
-        StartCoroutine(IdleMode());
+        
+        _actualNode = startNode;
+        CreatePath(startNode, destinyNode);
     }
+
     void Update()
     {
-
     }
 
     void FixedUpdate()
     {
-        if (_idleState)
+        if (_state == GhostState.Idle)
         {
-            IdleState();
+            IdleMovement();
             return;
         }
 
-        if (_scaredMode)
+        if (_state == GhostState.Eaten)
         {
-            MoveRandomly();
-            return;
+            if (_actualNode == startNode)
+            {
+                _physicCollider.enabled = true;
+                _state = GhostState.Idle;
+                GoToNormalSkin();
+                _speed = NORMAL_SPEED;
+                StartCoroutine(IdleState());
+                return;
+            }
         }
-
-        if (_dead)
-        {
-            GoToStart();
-            return;
-        }
+        
         GoToDestiny();
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Wall"))
+        if (other.gameObject.CompareTag("Wall") && _state == GhostState.Idle)
         {
-            if (_idleState) _horizontalMov *= -1;
+            _horizontalMov *= -1;
         }
-        else if (other.gameObject.CompareTag("Player"))
+
+        if (other.gameObject.CompareTag("Player") && _state == GhostState.Frightened)
         {
-            if (_scaredMode)
-            {
-                spriteRenderer.color = Color.white;
-                CreatePath(_actualNode, firstNode);
-            }
+            _state = GhostState.Eaten;
+            //Cambiarlo por un cambio de sprite
+            spriteRenderer.color = Color.white;
+            _speed *= 2;
+            _physicCollider.enabled = false;
         }
     }
 
     #endregion
 
     public Node ActualNode => _actualNode;
-    public bool ScaredMode => _scaredMode;
+    public GhostState ActualState => _state;
 
-    public void SetScaredMode(bool value)
+    public void SetFrightenedMode(bool value)
     {
-        _scaredMode = value;
-        
-        _randomNode = _actualNode.Nodes[Random.Range(0,(_actualNode.Nodes.Count - 1))].node;
+        if (!value)
+        {
+            _state = GhostState.Chase;
+            GoToNormalSkin();
+            return;
+        }
+
+        _state = GhostState.Frightened;
+        //Esto lo tengo que cambiar por un cambio de sprite
         spriteRenderer.color = Color.blue;
-        StartCoroutine(ScaredModeTimer());
+    }
+    private void CreatePath(Node start, Node destiny)
+    {
+        _aStar.ClearData();
+        List<Node> path = _aStar.FindPath(start, destiny);
+        _path = path != null || path.Count >= 1 ? path : _path;
+        
+        if (_path.Count == 0 || _path == null) return;
+        
+        _path.Reverse();
+        _path.RemoveAt(0);
+
     }
 
-    public void NormalGhostColor()
+    private IEnumerator IdleState()
     {
+        yield return new WaitForSeconds(_idleTime);
+        _state = GhostState.Chase;
+        transform.position = startNode.transform.position;
+    }
+
+    private void GoToNormalSkin()
+    {
+        /*
+         * Esto debo de cambiarlo para que cambie entre sprites y no tanto entre colores!!
+         */
         switch (id)
         {
             case 'B':
@@ -126,174 +163,133 @@ public class Ghost : MonoBehaviour
                 break;
         }
     }
-    
-    private IEnumerator Timer(float time)
-    {
-        yield return new WaitForSeconds(time);
-    }
 
-    private IEnumerator IdleMode()
-    {
-        yield return Timer(idleTime);
-        _idleState = false;
-        transform.position = firstNode.transform.position;
-    }
-
-    private IEnumerator ScaredModeTimer()
-    {
-        yield return Timer(scaredTime);
-        _scaredMode = false;
-        NormalGhostColor();
-    }
     #region GhostMovement
-    private void CreatePath(Node start, Node finish)
-    {
-        if (start == finish)
-            return;
-        
-        _aStar.ClearData();
-        _path = _aStar.FindPath(start, finish);
-        
-        if (_path == null || _path.Count == 0)
-            return;
-        
-        _path.Reverse();
-        _path.Remove(start);
-    }
 
     private void GoToDestiny()
     {
-        Vector2 target = _path[0].transform.position;
+        Vector2 target = _path.Count == 0 ? _actualNode.transform.position : _path[0].transform.position;
         
-        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
-        
-        if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
-        {
-            transform.position = _path[0].transform.position;
-            _actualNode = _path[0];
-            CreatePath(_actualNode, GetDestinyNode());
-        }
-    }
-
-    private void IdleState()
-    {
-        _rigidbody.MovePosition(_rigidbody.position + _horizontalMov * speed * Time.fixedDeltaTime);
-    }
-
-    private void MoveRandomly()
-    {
-        Vector2 target = _randomNode.transform.position;
-        
-        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
+        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,_speed * Time.fixedDeltaTime));
         
         if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
         {
-            transform.position = _randomNode.transform.position;
-            _randomNode = _randomNode.Nodes[Random.Range(0,(_randomNode.Nodes.Count - 1))].node;
+            transform.position = target;
+            _actualNode = _path.Count == 0 ? _actualNode : _path[0];
+            DefinePath();
         }
     }
 
-    private void GoToStart()
+    private void IdleMovement()
     {
-        Vector2 target = _path[0].transform.position;
-        
-        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
-        
-        if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
-        {
-            transform.position = _path[0].transform.position;
-            _actualNode = _path[0];
-            _path.RemoveAt(0);
-        }
-
-        if (_actualNode == firstNode)
-        {
-            _idleState = true;
-            StartCoroutine(IdleMode());
-        }
+        _rigidbody.MovePosition(_rigidbody.position + _horizontalMov * _speed * Time.fixedDeltaTime);
     }
-    private Node GetDestinyNode()
+    private void DefinePath()
     {
-        switch (id)
+        switch (_state)
         {
-            case 'B':
-                return pacman.LastNode;
-            case 'P':
+            case GhostState.Chase:
             {
-                char pacmanDirection = pacman.State switch
-                {
-                    State.Down => 'D',
-                    State.Up => 'U',
-                    State.Left => 'L',
-                    State.Right => 'R',
-                    _ => ' '
-                };
-
-                Node destiny = pacman.LastNode;
-                Node oldDestiny = destiny;
-                for (int i = 1; i <= 4; i++)
-                {
-                    foreach (NodeDirection nodeDirs in destiny.Nodes)
-                    {
-                        if (nodeDirs.direction == pacmanDirection)
-                        {
-                            destiny = nodeDirs.node;
-                            break;
-                        }
-                    }
-
-                    if (destiny == oldDestiny) break;
-                    oldDestiny = destiny;
-                }
-                return destiny;
+                Node destinyNode = GetDestinyNode();
+                CreatePath(_actualNode, destinyNode);
+                break;
             }
-            case 'I':
+            case GhostState.Frightened:
             {
-                Vector2 pacmanPosition = pacman.LastNode.transform.position;
-                Vector2 blinkyPosition = blinky.ActualNode.transform.position;
-                
-                Vector2 pacmanDirection = pacman.State switch
-                {
-                    State.Down => Vector2.down,
-                    State.Up => Vector2.up,
-                    State.Left => Vector2.left,
-                    State.Right => Vector2.right,
-                    _ => Vector2.zero
-                };
-
-                Vector2 temp = pacmanPosition + pacmanDirection * 2;
-                Vector2 destinyPosition = blinkyPosition + (temp - blinkyPosition) * 2;
-
-                Node[] nodes = this.nodes.GetComponentsInChildren<Node>();
-
-                Node bestNode = null;
-                float bestDistance = float.MaxValue;
-
-                foreach (Node node in nodes)
-                {
-                    float distance = Vector2.Distance(node.transform.position, destinyPosition);
-                    if (distance < bestDistance)
-                    {
-                        bestDistance = distance;
-                        bestNode = node;
-                    }
-                }
-                return bestNode;
+                int index = Random.Range(0, (cornerNodes.Count - 1));
+                Node destinyNode = cornerNodes[index];
+                CreatePath(_actualNode, destinyNode);
+                break;
             }
-            case 'C':
-            {
-                float distance = Vector2.Distance(pacman.transform.position, transform.position);
-
-                if (distance > 8f)
-                {
-                    return pacman.LastNode;
-                }
-                return cornerNodes[Random.Range(0,3)];
-            }
+            case GhostState.Scatter:
+                break;
+            case GhostState.Eaten:
+                CreatePath(_actualNode, startNode);
+                break;
         }
-
-        return null;
     }
     
+    private Node GetDestinyNode()
+        {
+            switch (id)
+            {
+                case 'B':
+                    return pacman.LastNode;
+                case 'P':
+                {
+                    char pacmanDirection = pacman.State switch
+                    {
+                        State.Down => 'D',
+                        State.Up => 'U',
+                        State.Left => 'L',
+                        State.Right => 'R',
+                        _ => ' '
+                    };
+        
+                    Node destiny = pacman.LastNode;
+                    Node oldDestiny = destiny;
+                    for (int i = 1; i <= 4; i++)
+                    {
+                        foreach (NodeDirection nodeDirs in destiny.Nodes)
+                        {
+                            if (nodeDirs.direction == pacmanDirection)
+                            {
+                                destiny = nodeDirs.node;
+                                break;
+                            }
+                        }
+        
+                        if (destiny == oldDestiny) break;
+                        oldDestiny = destiny;
+                    }
+                    return destiny;
+                }
+                case 'I':
+                {
+                    Vector2 pacmanPosition = pacman.LastNode.transform.position;
+                    Vector2 blinkyPosition = blinky.ActualNode.transform.position;
+                    
+                    Vector2 pacmanDirection = pacman.State switch
+                    {
+                        State.Down => Vector2.down,
+                        State.Up => Vector2.up,
+                        State.Left => Vector2.left,
+                        State.Right => Vector2.right,
+                        _ => Vector2.zero
+                    };
+        
+                    Vector2 temp = pacmanPosition + pacmanDirection * 2;
+                    Vector2 destinyPosition = blinkyPosition + (temp - blinkyPosition) * 2;
+        
+                    Node[] nodes = this.nodes.GetComponentsInChildren<Node>();
+        
+                    Node bestNode = null;
+                    float bestDistance = float.MaxValue;
+        
+                    foreach (Node node in nodes)
+                    {
+                        float distance = Vector2.Distance(node.transform.position, destinyPosition);
+                        if (distance < bestDistance)
+                        {
+                            bestDistance = distance;
+                            bestNode = node;
+                        }
+                    }
+                    return bestNode;
+                }
+                case 'C':
+                {
+                    float distance = Vector2.Distance(pacman.transform.position, transform.position);
+        
+                    if (distance > 8f)
+                    {
+                        return pacman.LastNode;
+                    }
+                    return cornerNodes[Random.Range(0,3)];
+                }
+            }
+        
+            return null;
+        }
     #endregion
 }

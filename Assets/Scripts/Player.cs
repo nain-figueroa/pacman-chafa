@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Rendering;
@@ -29,11 +30,7 @@ public class Player : MonoBehaviour
     private int _score;
     private bool _superPacman;
 
-    /*
-        ==========================
-        ||  Eventos de Unity    ||
-        ==========================
-    */
+    #region UnityMethods
     void Start()
     {
         Time.timeScale = 1f;
@@ -82,7 +79,7 @@ public class Player : MonoBehaviour
             if (point.SuperPoint)
             {
                 _superPacman = true;
-                StartCoroutine(SuperPacmanMode());
+                OnSuperPacmanMode?.Invoke();
             }
             point.gameObject.SetActive(false);
             _score += point.Value;
@@ -107,17 +104,19 @@ public class Player : MonoBehaviour
             SceneManager.LoadScene("GameOver");
         }
     }
-
-    /*
-        ======================================================
-        ||  Métodos y funciones definidas por el usuario    ||
-        ======================================================
-    */
+    #endregion
 
     public Node LastNode => _lastNode;
     public State State => _state;
     public int Score => _score;
     public bool SuperPacman => _superPacman;
+
+    public event Action OnSuperPacmanMode;
+
+    public void ChangeSuperPacmanState(bool value)
+    {
+        _superPacman = value;
+    }
     private bool isCompletelyInside(Collider2D node)
     {
         Bounds nodeBounds = node.bounds;
@@ -129,12 +128,6 @@ public class Player : MonoBehaviour
     private IEnumerator Timer(float time)
     {
         yield return new WaitForSeconds(time);
-    }
-
-    private IEnumerator SuperPacmanMode()
-    {
-        yield return Timer(5.0f);
-        _superPacman = false;
     }
 
     #region PlayerMovement
