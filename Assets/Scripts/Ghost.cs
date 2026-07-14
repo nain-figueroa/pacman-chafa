@@ -23,6 +23,8 @@ public class Ghost : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private List<Node> cornerNodes;
 
+    public float speed;
+    
     private Rigidbody2D _rigidbody;
     private Collider2D _physicCollider;
         
@@ -31,8 +33,8 @@ public class Ghost : MonoBehaviour
     private GhostState _state = GhostState.Idle;
     private Node _actualNode;
     private Vector2 _horizontalMov;
-    private float _idleTime, _speed;
-    private const float NORMAL_SPEED = 3f;
+    private float _idleTime;
+    private const float NormalSpeed = 3f;
 
     #region UnityMethods
     void Start()
@@ -44,7 +46,7 @@ public class Ghost : MonoBehaviour
             'I' => 3f,
             'C' => 6f
         };
-        _speed = NORMAL_SPEED;
+        speed = NormalSpeed;
         
         GoToNormalSkin();
         _state = GhostState.Idle;
@@ -78,7 +80,7 @@ public class Ghost : MonoBehaviour
                 _physicCollider.enabled = true;
                 _state = GhostState.Idle;
                 GoToNormalSkin();
-                _speed = NORMAL_SPEED;
+                speed = NormalSpeed;
                 StartCoroutine(IdleState());
                 return;
             }
@@ -99,7 +101,7 @@ public class Ghost : MonoBehaviour
             _state = GhostState.Eaten;
             //Cambiarlo por un cambio de sprite
             spriteRenderer.color = Color.white;
-            _speed *= 2;
+            speed *= 2;
             _physicCollider.enabled = false;
         }
     }
@@ -108,6 +110,20 @@ public class Ghost : MonoBehaviour
 
     public Node ActualNode => _actualNode;
     public GhostState ActualState => _state;
+    public float Speed => NormalSpeed;
+
+    public void ResetState()
+    {
+        StopAllCoroutines();
+        transform.position = startNode.transform.position;
+        _horizontalMov = Vector2.left;
+        _state = GhostState.Idle;
+        speed = NormalSpeed;
+        GoToNormalSkin();
+        _actualNode = startNode;
+        CreatePath(startNode, destinyNode);
+        StartCoroutine(IdleState());
+    }
 
     public void SetFrightenedMode(bool value)
     {
@@ -115,10 +131,12 @@ public class Ghost : MonoBehaviour
         {
             _state = GhostState.Chase;
             GoToNormalSkin();
+            StartCoroutine(ChaseState());
             return;
         }
 
         _state = GhostState.Frightened;
+        StopAllCoroutines();
         //Esto lo tengo que cambiar por un cambio de sprite
         spriteRenderer.color = Color.blue;
     }
@@ -135,11 +153,26 @@ public class Ghost : MonoBehaviour
 
     }
 
+    private IEnumerator ChaseState()
+    {
+        yield return new WaitForSeconds(4f);
+        _state = GhostState.Scatter;
+        StartCoroutine(ScatterState());
+    }
+
+    private IEnumerator ScatterState()
+    {
+        yield return new WaitForSeconds(4f);
+        _state = GhostState.Chase;
+        StartCoroutine(ChaseState());
+    }
+
     private IEnumerator IdleState()
     {
         yield return new WaitForSeconds(_idleTime);
         _state = GhostState.Chase;
         transform.position = startNode.transform.position;
+        StartCoroutine(ChaseState());
     }
 
     private void GoToNormalSkin()
@@ -170,7 +203,7 @@ public class Ghost : MonoBehaviour
     {
         Vector2 target = _path.Count == 0 ? _actualNode.transform.position : _path[0].transform.position;
         
-        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,_speed * Time.fixedDeltaTime));
+        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
         
         if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
         {
@@ -182,7 +215,7 @@ public class Ghost : MonoBehaviour
 
     private void IdleMovement()
     {
-        _rigidbody.MovePosition(_rigidbody.position + _horizontalMov * _speed * Time.fixedDeltaTime);
+        _rigidbody.MovePosition(_rigidbody.position + _horizontalMov * speed * Time.fixedDeltaTime);
     }
     private void DefinePath()
     {
@@ -202,7 +235,12 @@ public class Ghost : MonoBehaviour
                 break;
             }
             case GhostState.Scatter:
+            {
+                int index = Random.Range(0, (cornerNodes.Count - 1));
+                Node destiny = cornerNodes[index];
+                CreatePath(_actualNode, destinyNode);
                 break;
+            }
             case GhostState.Eaten:
                 CreatePath(_actualNode, startNode);
                 break;

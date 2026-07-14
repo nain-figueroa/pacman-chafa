@@ -13,22 +13,27 @@ public enum State
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private float speed;
     [SerializeField] private Collider2D directionCollider;
     [SerializeField] private GameObject skin;
+    [SerializeField] private bool godMode = false;
     
     private Rigidbody2D _rigidbody;
     private Transform _spriteTransform;
     private SpriteRenderer _spriteRenderer;
+    private Collider2D _collider2D;
     private State _state;
     private Node _node, _lastNode;
     private Dictionary<char, State> _charToState = new Dictionary<char, State>
     {
       {'L', State.Left}, {'R', State.Right}, {'D', State.Down}, {'U', State.Up}
     };
+    public float speed;
+    
     private bool _isInsideNode;
-    private int _score;
+    private int _score, _lifes = 3;
     private bool _superPacman;
+    private Vector3 _startPostion;
+    private const float NormalSpeed = 6f;
 
     #region UnityMethods
     void Start()
@@ -40,8 +45,13 @@ public class Player : MonoBehaviour
         _isInsideNode = false;
         _spriteRenderer = skin.GetComponent<SpriteRenderer>();
         _spriteTransform = skin.GetComponent<Transform>();
+        _collider2D = GetComponent<Collider2D>();
         _score = 0;
         _superPacman = false;
+        _startPostion = new Vector3(transform.position.x, transform.position.y, 0);
+        speed = NormalSpeed;
+
+        if (godMode) _collider2D.enabled = false;
     }
 
     void Update()
@@ -95,13 +105,23 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Ghost") && !_superPacman)
+        if (other.gameObject.CompareTag("Ghost"))
         {
-            Time.timeScale = 0;
-            Timer(2f);
-            SceneManager.LoadScene("GameOver");
+            if (_superPacman)
+            {
+                _score += 100;
+                return;
+            }
+            _lifes -= 1;
+            if (_lifes == 0)
+            {
+                OnDied?.Invoke();
+                return;
+            }
+            
+            OnGhostCollision?.Invoke();
         }
     }
     #endregion
@@ -109,13 +129,25 @@ public class Player : MonoBehaviour
     public Node LastNode => _lastNode;
     public State State => _state;
     public int Score => _score;
-    public bool SuperPacman => _superPacman;
+    public int Lifes => _lifes;
 
     public event Action OnSuperPacmanMode;
+
+    public event Action OnGhostCollision;
+    public event Action OnDied;
 
     public void ChangeSuperPacmanState(bool value)
     {
         _superPacman = value;
+    }
+
+    public void ResetState()
+    {
+        transform.position = _startPostion;
+        _state = State.Left;
+        _isInsideNode = false;
+        _superPacman = false;
+        speed = NormalSpeed;
     }
     private bool isCompletelyInside(Collider2D node)
     {
@@ -124,12 +156,7 @@ public class Player : MonoBehaviour
 
         return nodeBounds.Contains(playerBounds.min) && nodeBounds.Contains(playerBounds.max);
     }
-
-    private IEnumerator Timer(float time)
-    {
-        yield return new WaitForSeconds(time);
-    }
-
+    
     #region PlayerMovement
     private void PlayerMovement(State state)
     {
