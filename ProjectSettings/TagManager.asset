@@ -9,6 +9,7 @@ TagManager:
   - Ghost
   - Wall
   - Point
+  - Fruit
   layers:
   - Default
   - TransparentFX

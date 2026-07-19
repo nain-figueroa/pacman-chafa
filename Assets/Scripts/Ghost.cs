@@ -103,6 +103,7 @@ public class Ghost : MonoBehaviour
             spriteRenderer.color = Color.white;
             speed *= 2;
             _physicCollider.enabled = false;
+            StartCoroutine(PauseTime());
         }
     }
 
@@ -152,7 +153,14 @@ public class Ghost : MonoBehaviour
         _path.RemoveAt(0);
 
     }
+    #region Coroutines
 
+    private IEnumerator PauseTime()
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(1.5f);
+        Time.timeScale = 1;
+    }
     private IEnumerator ChaseState()
     {
         yield return new WaitForSeconds(4f);
@@ -174,6 +182,7 @@ public class Ghost : MonoBehaviour
         transform.position = startNode.transform.position;
         StartCoroutine(ChaseState());
     }
+    #endregion
 
     private void GoToNormalSkin()
     {

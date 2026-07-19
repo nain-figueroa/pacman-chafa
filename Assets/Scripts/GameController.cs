@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     [SerializeField] private Player pacman;
-    [SerializeField] private float superPacmanTime = 5f;
+    [SerializeField] private Fruit fruit;
+    [SerializeField] private float superPacmanTime = 7f;
     [SerializeField] private TextMeshProUGUI lifesText, scoreText, hiScoreText, levelText;
     [SerializeField] private List<Ghost> ghosts;
     [SerializeField] private GameObject points;
@@ -27,6 +28,7 @@ public class GameController : MonoBehaviour
 
         _level = 1;
         _pointsArray = points.GetComponentsInChildren<Point>();
+        StartCoroutine(PauseTime(1.5f));
     }
 
     void Update()
@@ -43,6 +45,13 @@ public class GameController : MonoBehaviour
             _level += 1;
             UpdateLevel();
         }
+
+        if (pacman.EatenPoints == 70 || pacman.EatenPoints == 170)
+        {
+            fruit.SetID(_level);
+            fruit.gameObject.SetActive(true);
+            StartCoroutine(DisableFruit());
+        }
     }
     #endregion
 
@@ -58,36 +67,65 @@ public class GameController : MonoBehaviour
         {
             StopCoroutine(_superPacmanTimer);
         }
+
+        StartCoroutine(PauseTime(1.5f));
         _superPacmanTimer = StartCoroutine(SuperPacmanTimer());
     }
 
     private void PacmanLifes()
     {
         ChangeLifeCounter();
-        StartCoroutine(StopEntitys(true));
+        StartCoroutine(StopEntitys(2f, true));
     }
 
     private void PacmanDied()
     {
         ChangeLifeCounter();
         StopAllCoroutines();
-        StartCoroutine(StopEntitys(false));
+        StartCoroutine(StopEntitys(2f));
         SceneManager.LoadScene("GameOver");
     }
 
     #endregion
 
-    private IEnumerator StopEntitys(bool resetEntitys)
+    #region Coroutines
+    private IEnumerator StopEntitys(float time,bool resetEntitys = false)
     {
         pacman.speed = 0f;
         foreach (var ghost in ghosts)
         {
             ghost.speed = 0f;
         }
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(time);
         if (resetEntitys) ResetEntitys();
     }
 
+    private IEnumerator SuperPacmanTimer()
+    {
+        yield return new WaitForSeconds(superPacmanTime);
+        
+        foreach (var ghost in ghosts)
+        {
+            if (ghost.ActualState == GhostState.Frightened) ghost.SetFrightenedMode(false);
+        }
+        pacman.ChangeSuperPacmanState(false);
+        _superPacmanTimer = null;
+    }
+
+    private IEnumerator DisableFruit()
+    {
+        yield return new WaitForSeconds(9.5f);
+        
+        fruit.gameObject.SetActive(false);
+    }
+
+    private IEnumerator PauseTime(float time)
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(time);
+        Time.timeScale = 1;
+    }
+    #endregion
     private void ResetEntitys()
     {
         pacman.ResetState();
@@ -104,18 +142,7 @@ public class GameController : MonoBehaviour
             point.gameObject.SetActive(true);
         }
         StopAllCoroutines();
-        StartCoroutine(StopEntitys(true));
-    }
-    private IEnumerator SuperPacmanTimer()
-    {
-        yield return new WaitForSeconds(superPacmanTime);
-        
-        foreach (var ghost in ghosts)
-        {
-            if (ghost.ActualState == GhostState.Frightened) ghost.SetFrightenedMode(false);
-        }
-        pacman.ChangeSuperPacmanState(false);
-        _superPacmanTimer = null;
+        StartCoroutine(StopEntitys(2f, true));
     }
 
     private void ChangeLifeCounter()

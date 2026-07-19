@@ -27,10 +27,12 @@ public class Player : MonoBehaviour
     {
       {'L', State.Left}, {'R', State.Right}, {'D', State.Down}, {'U', State.Up}
     };
+
+    private int[] _fruitPoints = {100, 300, 500, 500, 700, 700, 1000, 1000, 2000, 2000, 3000, 3000, 5000};
     public float speed;
     
     private bool _isInsideNode;
-    private int _score, _lifes = 3;
+    private int _score, _lifes = 3, _eatenPoints = 0;
     private bool _superPacman;
     private Vector3 _startPostion;
     private const float NormalSpeed = 6f;
@@ -38,7 +40,6 @@ public class Player : MonoBehaviour
     #region UnityMethods
     void Start()
     {
-        Time.timeScale = 1f;
         _rigidbody = GetComponent<Rigidbody2D>();
 
         _state = State.Left;
@@ -93,6 +94,15 @@ public class Player : MonoBehaviour
             }
             point.gameObject.SetActive(false);
             _score += point.Value;
+            _eatenPoints += 1;
+        }
+        else if (collision.CompareTag("Fruit"))
+        {
+            Fruit fruit = collision.GetComponent<Fruit>();
+            int index = fruit.ID < 13 ? fruit.ID - 1 : 12;
+            _score += _fruitPoints[index];
+            fruit.gameObject.SetActive(false);
+            Debug.Log(_fruitPoints[index]);
         }
     }
 
@@ -130,6 +140,7 @@ public class Player : MonoBehaviour
     public State State => _state;
     public int Score => _score;
     public int Lifes => _lifes;
+    public int EatenPoints => _eatenPoints;
 
     public event Action OnSuperPacmanMode;
 
@@ -148,6 +159,7 @@ public class Player : MonoBehaviour
         _isInsideNode = false;
         _superPacman = false;
         speed = NormalSpeed;
+        _eatenPoints = 0;
     }
     private bool isCompletelyInside(Collider2D node)
     {
