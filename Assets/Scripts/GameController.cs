@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,8 +19,22 @@ public class GameController : MonoBehaviour
     private int _highScore, _level;
     private Coroutine _superPacmanTimer;
     private Point[] _pointsArray;
+    private string _dataPath, _fullSavePath,_dataJson = "/gameData.json";
 
     #region UnityMethods
+
+    private void Awake()
+    {
+        _dataPath = Application.persistentDataPath;
+        _fullSavePath = _dataPath + _dataJson;
+        if (!File.Exists(_fullSavePath))
+        {
+            File.Create(_fullSavePath);
+        }
+        LoadData();
+        hiScoreText.text = $"{_highScore}";
+    }
+
     void Start()
     {
         pacman.OnSuperPacmanMode += SuperPacman;
@@ -38,12 +54,12 @@ public class GameController : MonoBehaviour
         if (pacman.Score > _highScore)
         {
             hiScoreText.text = $"{pacman.Score}";
+            _highScore = pacman.Score;
         }
 
         if (IsAllPointsDisabled())
         {
-            ResetWorld();
-            _level += 1;
+            StartCoroutine(ResetWorld());
         }
 
         if (pacman.EatenPoints == 70 || pacman.EatenPoints == 170)
@@ -129,10 +145,49 @@ public class GameController : MonoBehaviour
 
     private IEnumerator ChangeToGameOverScene()
     {
+        SaveData();
         yield return new WaitForSeconds(pacmanDeadAnimation.length);
         SceneManager.LoadScene("GameOver");
     }
+    private IEnumerator ResetWorld()
+    {
+        yield return StopEntitys(1f, true);
+        foreach (var point in _pointsArray)
+        {
+            point.gameObject.SetActive(true);
+        }
+        
+        _level += 1;
+        StopAllCoroutines();
+        StartCoroutine(PauseTime(1.5f));
+    }
     #endregion
+
+    private void SaveData()
+    {
+        GameData gameData = new GameData() { highScore = _highScore};
+        Debug.Log($"High Score: {_highScore}");
+        string dataJson = JsonUtility.ToJson(gameData);
+        Debug.Log($"High Score guardado: {dataJson}");
+        File.WriteAllText(_fullSavePath, dataJson);
+    }
+
+    private void LoadData()
+    {
+        GameData gameData = new();
+        string dataText = File.ReadAllText(_fullSavePath);
+        Debug.Log($"High Score cargado: {dataText}");
+
+        if (dataText == "")
+        {
+            _highScore = 0;
+            return;
+        }
+        gameData = JsonUtility.FromJson<GameData>(dataText);
+
+        _highScore = gameData.highScore;
+    }
+    
     private void ResetEntitys()
     {
         pacman.ResetState();
@@ -142,15 +197,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void ResetWorld()
-    {
-        foreach (var point in _pointsArray)
-        {
-            point.gameObject.SetActive(true);
-        }
-        StopAllCoroutines();
-        StartCoroutine(StopEntitys(2f, true));
-    }
 
     private void ChangeLifeCounter()
     {
