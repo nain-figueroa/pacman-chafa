@@ -5,9 +5,6 @@ using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-/*
- *  Ahora queda ver el tema de los cambios de sprites entre modos
- */
 public enum GhostState
 {
     Idle, Chase, Scatter, Frightened, Eaten
@@ -20,9 +17,11 @@ public class Ghost : MonoBehaviour
     [SerializeField] private Player pacman;
     [SerializeField] private GameObject nodes;
     [SerializeField] private Ghost blinky = null;
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private SpriteRenderer spriteRenderer, eyesSpriteRender;
     [SerializeField] private List<Node> cornerNodes;
+    [SerializeField] private List<Sprite> eyes;
 
+    public Animator animator;
     public float speed;
     
     private Rigidbody2D _rigidbody;
@@ -35,6 +34,10 @@ public class Ghost : MonoBehaviour
     private Vector2 _horizontalMov;
     private float _idleTime;
     private const float NormalSpeed = 3f;
+    private Dictionary<Vector2, int> directionToEyes= new Dictionary<Vector2, int>
+    {
+        {Vector2.right, 0}, {Vector2.left, 1}, {Vector2.down, 2}, {Vector2.up, 3}, {Vector2.zero, 0} 
+    };
 
     #region UnityMethods
     void Start()
@@ -81,6 +84,7 @@ public class Ghost : MonoBehaviour
                 _state = GhostState.Idle;
                 GoToNormalSkin();
                 speed = NormalSpeed;
+                spriteRenderer.gameObject.SetActive(true);
                 StartCoroutine(IdleState());
                 return;
             }
@@ -99,9 +103,10 @@ public class Ghost : MonoBehaviour
         if (other.gameObject.CompareTag("Player") && _state == GhostState.Frightened)
         {
             _state = GhostState.Eaten;
-            //Cambiarlo por un cambio de sprite
-            spriteRenderer.color = Color.white;
-            speed *= 2;
+
+            spriteRenderer.gameObject.SetActive(false);
+            eyesSpriteRender.gameObject.SetActive(true);
+            speed *= 4;
             _physicCollider.enabled = false;
             StartCoroutine(PauseTime());
         }
@@ -131,15 +136,19 @@ public class Ghost : MonoBehaviour
         if (!value)
         {
             _state = GhostState.Chase;
+            animator.SetBool("superPacman", false);
             GoToNormalSkin();
             StartCoroutine(ChaseState());
+            eyesSpriteRender.gameObject.SetActive(true);
             return;
         }
 
         _state = GhostState.Frightened;
         StopAllCoroutines();
-        //Esto lo tengo que cambiar por un cambio de sprite
-        spriteRenderer.color = Color.blue;
+
+        animator.SetBool("superPacman", true);
+        eyesSpriteRender.gameObject.SetActive(false);
+        spriteRenderer.color = Color.white;
     }
     private void CreatePath(Node start, Node destiny)
     {
@@ -158,7 +167,7 @@ public class Ghost : MonoBehaviour
     private IEnumerator PauseTime()
     {
         Time.timeScale = 0;
-        yield return new WaitForSecondsRealtime(1.5f);
+        yield return new WaitForSecondsRealtime(0.5f);
         Time.timeScale = 1;
     }
     private IEnumerator ChaseState()
@@ -186,9 +195,6 @@ public class Ghost : MonoBehaviour
 
     private void GoToNormalSkin()
     {
-        /*
-         * Esto debo de cambiarlo para que cambie entre sprites y no tanto entre colores!!
-         */
         switch (id)
         {
             case 'B':
@@ -210,9 +216,13 @@ public class Ghost : MonoBehaviour
 
     private void GoToDestiny()
     {
-        Vector2 target = _path.Count == 0 ? _actualNode.transform.position : _path[0].transform.position;
+        if (eyesSpriteRender.enabled)
+            eyesSpriteRender.sprite = eyes[directionToEyes[GetDirection(_path.Count == 0 ? _actualNode : _path[0])]];
         
-        _rigidbody.MovePosition(Vector2.MoveTowards(_rigidbody.position, target,speed * Time.fixedDeltaTime));
+        Vector2 target = _path.Count == 0 ? _actualNode.transform.position : _path[0].transform.position;
+        Vector2 newPosition = Vector2.MoveTowards(_rigidbody.position, target, speed * Time.fixedDeltaTime);
+        
+        _rigidbody.MovePosition(newPosition);
         
         if (Vector2.Distance(_rigidbody.position, target) < 0.05f)
         {
@@ -254,6 +264,28 @@ public class Ghost : MonoBehaviour
                 CreatePath(_actualNode, startNode);
                 break;
         }
+    }
+
+    private Vector2 GetDirection(Node destinyNode)
+    {
+        Vector2 direction = Vector2.zero;
+        foreach (NodeDirection node in _actualNode.Nodes)
+        {
+            if (node.node.ID == destinyNode.ID)
+            {
+                direction = node.direction switch
+                {
+                    'U' => Vector2.up,
+                    'D' => Vector2.down,
+                    'L' => Vector2.left,
+                    'R' => Vector2.right,
+                    _ => Vector2.zero
+                    
+                };
+            }
+        }
+
+        return direction;
     }
     
     private Node GetDestinyNode()

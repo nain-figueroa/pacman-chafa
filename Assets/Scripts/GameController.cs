@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private Fruit fruit;
     [SerializeField] private float superPacmanTime = 7f;
     [SerializeField] private TextMeshProUGUI lifesText, scoreText, hiScoreText, levelText;
+    [SerializeField] private AnimationClip pacmanDeadAnimation;
     [SerializeField] private List<Ghost> ghosts;
     [SerializeField] private GameObject points;
 
@@ -48,8 +49,7 @@ public class GameController : MonoBehaviour
 
         if (pacman.EatenPoints == 70 || pacman.EatenPoints == 170)
         {
-            fruit.SetID(_level);
-            fruit.gameObject.SetActive(true);
+            fruit.ActivateFruit(_level);
             StartCoroutine(DisableFruit());
         }
     }
@@ -68,28 +68,30 @@ public class GameController : MonoBehaviour
             StopCoroutine(_superPacmanTimer);
         }
 
-        StartCoroutine(PauseTime(1.5f));
+        StartCoroutine(PauseTime(0.5f));
         _superPacmanTimer = StartCoroutine(SuperPacmanTimer());
     }
 
     private void PacmanLifes()
     {
         ChangeLifeCounter();
-        StartCoroutine(StopEntitys(2f, true));
+        StartCoroutine(StopEntitys(pacmanDeadAnimation.length + 1f, true));
+        pacman.animator.SetBool("isDead", true);
     }
 
     private void PacmanDied()
     {
         ChangeLifeCounter();
         StopAllCoroutines();
-        StartCoroutine(StopEntitys(2f));
-        SceneManager.LoadScene("GameOver");
+        StartCoroutine(StopEntitys(pacmanDeadAnimation.length + 1f));
+        pacman.animator.SetBool("isDead", true);
+        StartCoroutine(ChangeToGameOverScene());
     }
 
     #endregion
 
     #region Coroutines
-    private IEnumerator StopEntitys(float time,bool resetEntitys = false)
+    private IEnumerator StopEntitys(float time, bool resetEntitys = false)
     {
         pacman.speed = 0f;
         foreach (var ghost in ghosts)
@@ -124,6 +126,12 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0;
         yield return new WaitForSecondsRealtime(time);
         Time.timeScale = 1;
+    }
+
+    private IEnumerator ChangeToGameOverScene()
+    {
+        yield return new WaitForSeconds(pacmanDeadAnimation.length);
+        SceneManager.LoadScene("GameOver");
     }
     #endregion
     private void ResetEntitys()

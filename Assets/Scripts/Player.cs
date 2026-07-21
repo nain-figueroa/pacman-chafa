@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject skin;
     [SerializeField] private bool godMode = false;
     
+    public Animator animator;
+    
     private Rigidbody2D _rigidbody;
     private Transform _spriteTransform;
     private SpriteRenderer _spriteRenderer;
@@ -99,10 +101,8 @@ public class Player : MonoBehaviour
         else if (collision.CompareTag("Fruit"))
         {
             Fruit fruit = collision.GetComponent<Fruit>();
-            int index = fruit.ID < 13 ? fruit.ID - 1 : 12;
-            _score += _fruitPoints[index];
+            _score += _fruitPoints[fruit.ID - 1];
             fruit.gameObject.SetActive(false);
-            Debug.Log(_fruitPoints[index]);
         }
     }
 
@@ -160,6 +160,7 @@ public class Player : MonoBehaviour
         _superPacman = false;
         speed = NormalSpeed;
         _eatenPoints = 0;
+        animator.SetBool("isDead", false);
     }
     private bool isCompletelyInside(Collider2D node)
     {

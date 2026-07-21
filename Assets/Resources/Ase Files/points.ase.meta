@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1c2513da69fd3d474b6c04301a453ce6
+guid: 488781b38126da1d28221264bd465066
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,9 +127,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Map
+  - name: points
     originalName: 
-    pivot: {x: 0.516129, y: 0}
+    pivot: {x: 0.475, y: -1.1}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,9 +137,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 124
-      height: 96
-    spriteID: 06e5c3103aefbc1ff908b5b99a5215d5
+      width: 40
+      height: 10
+    spriteID: f68e992fbb49ca369b8abcc520a31a8d
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,25 +153,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 696030444
+      value0: 1838257019
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: Map
+    name: points
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Map
+    - name: points
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 0
-        y: 0
-        width: 124
-        height: 96
-      spriteId: 06e5c3103aefbc1ff908b5b99a5215d5
+        x: 13
+        y: 11
+        width: 40
+        height: 10
+      spriteId: f68e992fbb49ca369b8abcc520a31a8d
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -181,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 128, y: 96}
-  previousTextureSize: {x: 256, y: 128}
+  canvasSize: {x: 64, y: 32}
+  previousTextureSize: {x: 64, y: 32}

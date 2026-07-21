@@ -1,10 +1,31 @@
 fileFormatVersion: 2
-guid: 4e5222ba7985075c98ed857a5a97c084
+guid: 471bda71dbbae64c48efe654e06fd071
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4448715427215634006
-    second: ghost_0
+      213: -3140944659011227795
+    second: ghost_eyes_0
+  - first:
+      213: -7928505697479704830
+    second: ghost_eyes_1
+  - first:
+      213: -2702087640214211047
+    second: ghost_eyes_2
+  - first:
+      213: -5711049214164830593
+    second: ghost_eyes_3
+  - first:
+      213: 3806649035023643478
+    second: ghost_eyes_4
+  - first:
+      213: 1101960503680351926
+    second: ghost_eyes_5
+  - first:
+      213: 3529072470738290258
+    second: ghost_eyes_6
+  - first:
+      213: -292407569319489344
+    second: ghost_eyes_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +134,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ghost_0
+      name: ghost_eyes_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,14 +149,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 65eecf95c130dbd30800000000000000
-      internalID: 4448715427215634006
+      spriteID: d6fa97c597f1964d0800000000000000
+      internalID: -3140944659011227795
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost_1
+      name: ghost_eyes_1
       rect:
         serializedVersion: 2
         x: 32
@@ -148,16 +169,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 2663c9d1d2b6411629e04fe69e88e98d
-      internalID: -1191259188
+      spriteID: 20fbf0e331a48f190800000000000000
+      internalID: -7928505697479704830
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost_2
+      name: ghost_eyes_2
       rect:
         serializedVersion: 2
         x: 64
@@ -170,16 +191,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: eba9d442910d2c6ed82dc8825fec9740
-      internalID: -576623021
+      spriteID: 916fe058b91408ad0800000000000000
+      internalID: -2702087640214211047
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost_3
+      name: ghost_eyes_3
       rect:
         serializedVersion: 2
         x: 96
@@ -192,10 +213,10 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: eac39ac4a3f6b1cbe88df42f41eab883
-      internalID: 1964173790
+      spriteID: f767ee68ff64eb0b0800000000000000
+      internalID: -5711049214164830593
       vertices: []
       indices: 
       edges: []
@@ -204,7 +225,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 29c06297785028cad941bd38e3363fcd
+    spriteID: 4f8b18cb1be1f1d3ba12120f29d75192
     internalID: 0
     vertices: []
     indices: 
@@ -216,10 +237,10 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      ghost_0: 4448715427215634006
-      ghost_1: -1191259188
-      ghost_2: -576623021
-      ghost_3: 1964173790
+      ghost_eyes_0: -3140944659011227795
+      ghost_eyes_1: -7928505697479704830
+      ghost_eyes_2: -2702087640214211047
+      ghost_eyes_3: -5711049214164830593
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

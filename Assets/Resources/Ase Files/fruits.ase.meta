@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1c2513da69fd3d474b6c04301a453ce6
+guid: cd8d60416f473c7178ae636361765615
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -127,9 +127,9 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Map
+  - name: fruits
     originalName: 
-    pivot: {x: 0.516129, y: 0}
+    pivot: {x: 0.49999997, y: -0.016129032}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     customData: 
@@ -137,9 +137,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 124
-      height: 96
-    spriteID: 06e5c3103aefbc1ff908b5b99a5215d5
+      width: 122
+      height: 62
+    spriteID: 4c54bcbad2c93aff4b6b50b5b1cd847f
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -153,25 +153,25 @@ ScriptedImporter:
   asepriteLayers:
   - layerIndex: 0
     uuid:
-      value0: 696030444
+      value0: 3154018787
       value1: 0
       value2: 0
       value3: 0
     guid: 0
-    name: Map
+    name: fruits
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Map
+    - name: fruits
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 0
-        y: 0
-        width: 124
-        height: 96
-      spriteId: 06e5c3103aefbc1ff908b5b99a5215d5
+        x: 3
+        y: 1
+        width: 122
+        height: 62
+      spriteId: 4c54bcbad2c93aff4b6b50b5b1cd847f
     linkedCells: []
     tileCells: []
     tileSetIndex: 0
@@ -181,5 +181,5 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 128, y: 96}
+  canvasSize: {x: 128, y: 64}
   previousTextureSize: {x: 256, y: 128}

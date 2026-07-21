@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 4e5222ba7985075c98ed857a5a97c084
+guid: 07b8be6bf873a11bebe3d5324f58089a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4448715427215634006
-    second: ghost_0
+      213: -8051468652260585898
+    second: ghost_frightened_0
+  - first:
+      213: -3142640044072094530
+    second: ghost_frightened_1
+  - first:
+      213: -811498009187010844
+    second: ghost_frightened_2
+  - first:
+      213: -7730214467510512650
+    second: ghost_frightened_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +122,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ghost_0
+      name: ghost_frightened_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 65eecf95c130dbd30800000000000000
-      internalID: 4448715427215634006
+      spriteID: 65e80d55bef634090800000000000000
+      internalID: -8051468652260585898
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost_1
+      name: ghost_frightened_1
       rect:
         serializedVersion: 2
         x: 32
@@ -148,16 +157,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 2663c9d1d2b6411629e04fe69e88e98d
-      internalID: -1191259188
+      spriteID: eb43a24c7891364d0800000000000000
+      internalID: -3142640044072094530
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost_2
+      name: ghost_frightened_2
       rect:
         serializedVersion: 2
         x: 64
@@ -170,16 +179,16 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: eba9d442910d2c6ed82dc8825fec9740
-      internalID: -576623021
+      spriteID: 4e6b8723cdafcb4f0800000000000000
+      internalID: -811498009187010844
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost_3
+      name: ghost_frightened_3
       rect:
         serializedVersion: 2
         x: 96
@@ -192,10 +201,10 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: eac39ac4a3f6b1cbe88df42f41eab883
-      internalID: 1964173790
+      spriteID: 6f35372f5e2c8b490800000000000000
+      internalID: -7730214467510512650
       vertices: []
       indices: 
       edges: []
@@ -204,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 29c06297785028cad941bd38e3363fcd
+    spriteID: 1aca97b96821c457da031feeb63ab667
     internalID: 0
     vertices: []
     indices: 
@@ -216,10 +225,10 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      ghost_0: 4448715427215634006
-      ghost_1: -1191259188
-      ghost_2: -576623021
-      ghost_3: 1964173790
+      ghost_frightened_0: -8051468652260585898
+      ghost_frightened_1: -3142640044072094530
+      ghost_frightened_2: -811498009187010844
+      ghost_frightened_3: -7730214467510512650
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
