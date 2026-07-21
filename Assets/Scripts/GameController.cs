@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] private Player pacman;
     [SerializeField] private Fruit fruit;
     [SerializeField] private float superPacmanTime = 7f;
-    [SerializeField] private TextMeshProUGUI lifesText, scoreText, hiScoreText;
+    [SerializeField] private TextMeshProUGUI scoreText, hiScoreText;
     [SerializeField] private AnimationClip pacmanDeadAnimation;
     [SerializeField] private List<Ghost> ghosts;
+    [SerializeField] private List<Image> pacmanLifes;
+    [SerializeField] private List<Image> fruitsCounters;
     [SerializeField] private GameObject points;
 
     private int _highScore, _level;
@@ -40,12 +43,17 @@ public class GameController : MonoBehaviour
         pacman.OnSuperPacmanMode += SuperPacman;
         pacman.OnGhostCollision += PacmanLifes;
         pacman.OnDied += PacmanDied;
+        pacman.OnFruitEaten += FruitEaten;
 
         _highScore = int.Parse(hiScoreText.text);
 
         _level = 1;
         _pointsArray = points.GetComponentsInChildren<Point>();
         StartCoroutine(PauseTime(1.5f));
+        foreach (var fruitCounter in fruitsCounters)
+        {
+            fruitCounter.gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -103,6 +111,21 @@ public class GameController : MonoBehaviour
         StartCoroutine(ChangeToGameOverScene());
     }
 
+    private void FruitEaten(int fruitId)
+    {
+        if (!fruitsCounters[fruitId].gameObject.activeSelf)
+        {
+            fruitsCounters[fruitId].gameObject.SetActive(true);
+            return;
+        }
+
+        var amountTextMesh = fruitsCounters[fruitId].GetComponentInChildren<TextMeshProUGUI>();
+        string amountText = amountTextMesh.text;
+        amountText = amountText.Remove(0, 1);
+
+        int amountInt = int.Parse(amountText);
+        amountTextMesh.text = $"x{amountInt + 1}";
+    }
     #endregion
 
     #region Coroutines
@@ -156,6 +179,11 @@ public class GameController : MonoBehaviour
         {
             point.gameObject.SetActive(true);
         }
+
+        foreach (var life in pacmanLifes)
+        {
+            life.gameObject.SetActive(true);
+        }
         
         _level += 1;
         StopAllCoroutines();
@@ -166,9 +194,7 @@ public class GameController : MonoBehaviour
     private void SaveData()
     {
         GameData gameData = new GameData() { highScore = _highScore};
-        Debug.Log($"High Score: {_highScore}");
         string dataJson = JsonUtility.ToJson(gameData);
-        Debug.Log($"High Score guardado: {dataJson}");
         File.WriteAllText(_fullSavePath, dataJson);
     }
 
@@ -176,7 +202,6 @@ public class GameController : MonoBehaviour
     {
         GameData gameData = new();
         string dataText = File.ReadAllText(_fullSavePath);
-        Debug.Log($"High Score cargado: {dataText}");
 
         if (dataText == "")
         {
@@ -200,7 +225,7 @@ public class GameController : MonoBehaviour
 
     private void ChangeLifeCounter()
     {
-        lifesText.text = $"{pacman.Lifes}";
+        pacmanLifes[pacman.Lifes].gameObject.SetActive(false);
     }
 
     private void UpdateScore()

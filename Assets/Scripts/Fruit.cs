@@ -9,7 +9,7 @@ public class Fruit : MonoBehaviour
 
     private Dictionary<int, int> levelToIndex = new Dictionary<int, int>()
     {
-        {1, 0}, {2, 1}, {3, 2}, {4, 2}, {5, 3}, {6, 3}, {7, 4}, {8, 4}, {9, 5}, {10, 5}, {11, 6}, {12, 6}, {13, 7}
+        {1, 0}, {2, 1}, {3, 2}, {4, 2}, {5, 3}, {6, 3}, {7, 4}, {8, 4}, {9, 5}, {10, 5}, {11, 6}, {12, 6}
     };
     #region UnityMethods
     void Start()
@@ -32,8 +32,8 @@ public class Fruit : MonoBehaviour
 
     public void ActivateFruit(int level)
     {
-        _id = level >= 13 ? 13 : level;
+        _id = level >= 13 ? 7 : levelToIndex[level];
         gameObject.SetActive(true);
-        spriteRenderer.sprite = sprites[levelToIndex[_id]];
+        spriteRenderer.sprite = sprites[_id];
     }
 }

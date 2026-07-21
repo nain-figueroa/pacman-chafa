@@ -30,7 +30,7 @@ public class Player : MonoBehaviour
       {'L', State.Left}, {'R', State.Right}, {'D', State.Down}, {'U', State.Up}
     };
 
-    private int[] _fruitPoints = {100, 300, 500, 500, 700, 700, 1000, 1000, 2000, 2000, 3000, 3000, 5000};
+    private int[] _fruitPoints = {100, 300, 500, 700, 1000, 2000, 3000, 5000};
     public float speed;
     
     private bool _isInsideNode;
@@ -101,7 +101,8 @@ public class Player : MonoBehaviour
         else if (collision.CompareTag("Fruit"))
         {
             Fruit fruit = collision.GetComponent<Fruit>();
-            _score += _fruitPoints[fruit.ID - 1];
+            _score += _fruitPoints[fruit.ID];
+            OnFruitEaten?.Invoke(fruit.ID);
             fruit.gameObject.SetActive(false);
         }
     }
@@ -146,6 +147,7 @@ public class Player : MonoBehaviour
 
     public event Action OnGhostCollision;
     public event Action OnDied;
+    public event Action<int> OnFruitEaten;
 
     public void ChangeSuperPacmanState(bool value)
     {
