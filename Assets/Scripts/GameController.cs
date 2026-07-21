@@ -9,7 +9,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private Player pacman;
     [SerializeField] private Fruit fruit;
     [SerializeField] private float superPacmanTime = 7f;
-    [SerializeField] private TextMeshProUGUI lifesText, scoreText, hiScoreText, levelText;
+    [SerializeField] private TextMeshProUGUI lifesText, scoreText, hiScoreText;
     [SerializeField] private AnimationClip pacmanDeadAnimation;
     [SerializeField] private List<Ghost> ghosts;
     [SerializeField] private GameObject points;
@@ -44,7 +44,6 @@ public class GameController : MonoBehaviour
         {
             ResetWorld();
             _level += 1;
-            UpdateLevel();
         }
 
         if (pacman.EatenPoints == 70 || pacman.EatenPoints == 170)
@@ -161,11 +160,6 @@ public class GameController : MonoBehaviour
     private void UpdateScore()
     {
         scoreText.text = $"{pacman.Score}";
-    }
-
-    private void UpdateLevel()
-    {
-        levelText.text = $"{_level}";
     }
 
     private bool IsAllPointsDisabled()
