@@ -610,6 +610,7 @@ GameObject:
   m_Component:
   - component: {fileID: 33489893}
   - component: {fileID: 33489892}
+  - component: {fileID: 33489894}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -635,6 +636,15 @@ MonoBehaviour:
   scoreText: {fileID: 46133458}
   hiScoreText: {fileID: 542352304}
   pacmanDeadAnimation: {fileID: 7400000, guid: 427f3510386f0e9b6b39e8742c2823c1, type: 2}
+  audioSource: {fileID: 33489894}
+  startAudio: {fileID: 8300000, guid: 1daefddb47b4d31a4824154d656fd80f, type: 3}
+  ghostAudio: {fileID: 8300000, guid: c0ccb799628a9133287bfac93ded2493, type: 3}
+  ghostFrightenedAudio: {fileID: 8300000, guid: ccd20bc5f4ecae2f4892ecabf29cf145, type: 3}
+  startDeadAudio: {fileID: 8300000, guid: 1db51c3b7653deba78e093e281c53329, type: 3}
+  deadAudio: {fileID: 8300000, guid: b636402f72f9e377ba4b469417062ddc, type: 3}
+  pointAudios:
+  - {fileID: 8300000, guid: 6b01eb75efe971b45aa9809a5a926626, type: 3}
+  - {fileID: 8300000, guid: daa4eb2af1b444c8ba74eed294c86156, type: 3}
   ghosts:
   - {fileID: 613422582}
   - {fileID: 1195460664}
@@ -669,6 +679,103 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &33489894
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33489891}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 1daefddb47b4d31a4824154d656fd80f, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.479
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &37672157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23973,6 +24080,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 724150984307721570, guid: 7761cf0094ac2551c85f8e9f50252f65, type: 3}
+      propertyPath: fruitAudio
+      value: 
+      objectReference: {fileID: 8300000, guid: e999030ab01e9a48bb1960feeb88eb4d, type: 3}
+    - target: {fileID: 724150984307721570, guid: 7761cf0094ac2551c85f8e9f50252f65, type: 3}
+      propertyPath: ghostAudio
+      value: 
+      objectReference: {fileID: 8300000, guid: 3c8a7dc6f43de00038378a8d91fb3128, type: 3}
+    - target: {fileID: 1328559720219285796, guid: 7761cf0094ac2551c85f8e9f50252f65, type: 3}
+      propertyPath: m_Volume
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 2710007604132029996, guid: 7761cf0094ac2551c85f8e9f50252f65, type: 3}
       propertyPath: m_Name
       value: Player

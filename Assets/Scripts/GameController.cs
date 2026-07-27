@@ -14,6 +14,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private float superPacmanTime = 7f;
     [SerializeField] private TextMeshProUGUI scoreText, hiScoreText;
     [SerializeField] private AnimationClip pacmanDeadAnimation;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip startAudio, ghostAudio, ghostFrightenedAudio, startDeadAudio, deadAudio;
+    [SerializeField] private List<AudioClip> pointAudios;
     [SerializeField] private List<Ghost> ghosts;
     [SerializeField] private List<Image> pacmanLifes;
     [SerializeField] private List<Image> fruitsCounters;
@@ -49,7 +52,11 @@ public class GameController : MonoBehaviour
 
         _level = 1;
         _pointsArray = points.GetComponentsInChildren<Point>();
-        StartCoroutine(PauseTime(1.5f));
+
+        audioSource.clip = startAudio;
+        StartCoroutine(PauseTime(startAudio.length));
+        audioSource.PlayOneShot(startAudio);
+        
         foreach (var fruitCounter in fruitsCounters)
         {
             fruitCounter.gameObject.SetActive(false);
@@ -58,6 +65,12 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
+        if (!audioSource.isPlaying && audioSource.clip == startAudio)
+        {
+            audioSource.clip = ghostAudio;
+            audioSource.volume = 0.2f;
+            audioSource.Play();
+        }
         UpdateScore();
         if (pacman.Score > _highScore)
         {
@@ -91,6 +104,8 @@ public class GameController : MonoBehaviour
             StopCoroutine(_superPacmanTimer);
         }
 
+        audioSource.clip = ghostFrightenedAudio;
+        audioSource.Play();
         StartCoroutine(PauseTime(0.5f));
         _superPacmanTimer = StartCoroutine(SuperPacmanTimer());
     }
@@ -98,17 +113,14 @@ public class GameController : MonoBehaviour
     private void PacmanLifes()
     {
         ChangeLifeCounter();
-        StartCoroutine(StopEntitys(pacmanDeadAnimation.length + 1f, true));
-        pacman.animator.SetBool("isDead", true);
+        StartCoroutine(PacmanDiedAnimation());
     }
 
     private void PacmanDied()
     {
         ChangeLifeCounter();
         StopAllCoroutines();
-        StartCoroutine(StopEntitys(pacmanDeadAnimation.length + 1f));
-        pacman.animator.SetBool("isDead", true);
-        StartCoroutine(ChangeToGameOverScene());
+        StartCoroutine(PacmanDiedAnimation(true));
     }
 
     private void FruitEaten(int fruitId)
@@ -150,6 +162,8 @@ public class GameController : MonoBehaviour
         }
         pacman.ChangeSuperPacmanState(false);
         _superPacmanTimer = null;
+        audioSource.clip = ghostAudio;
+        audioSource.Play();
     }
 
     private IEnumerator DisableFruit()
@@ -189,8 +203,26 @@ public class GameController : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(PauseTime(1.5f));
     }
-    #endregion
 
+    private IEnumerator PacmanDiedAnimation(bool lastLife = false)
+    {
+        yield return PauseTime(1f);
+        
+        pacman.animator.SetBool("isDead", true);
+        audioSource.PlayOneShot(deadAudio);
+        
+        yield return StopEntitys(pacmanDeadAnimation.length + 1f);
+
+        if (lastLife)
+        {
+            StartCoroutine(ChangeToGameOverScene());
+        }
+        else
+        {
+            ResetEntitys();
+        }
+    }
+    #endregion
     private void SaveData()
     {
         GameData gameData = new GameData() { highScore = _highScore};
@@ -225,6 +257,7 @@ public class GameController : MonoBehaviour
 
     private void ChangeLifeCounter()
     {
+        audioSource.PlayOneShot(startDeadAudio);
         pacmanLifes[pacman.Lifes].gameObject.SetActive(false);
     }
 

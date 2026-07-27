@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,6 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField] private Collider2D directionCollider;
     [SerializeField] private GameObject skin;
     [SerializeField] private bool godMode = false;
+    [SerializeField] private AudioClip fruitAudio, ghostAudio;
+    [SerializeField] private List<AudioClip> pointAudios;
     
     public Animator animator;
     
@@ -23,6 +26,7 @@ public class Player : MonoBehaviour
     private Transform _spriteTransform;
     private SpriteRenderer _spriteRenderer;
     private Collider2D _collider2D;
+    private AudioSource _audioSource;
     private State _state;
     private Node _node, _lastNode;
     private Dictionary<char, State> _charToState = new Dictionary<char, State>
@@ -34,7 +38,7 @@ public class Player : MonoBehaviour
     public float speed;
     
     private bool _isInsideNode;
-    private int _score, _lifes = 3, _eatenPoints = 0;
+    private int _score, _lifes = 3, _eatenPoints = 0, _actualPointAudio;
     private bool _superPacman;
     private Vector3 _startPostion;
     private const float NormalSpeed = 6f;
@@ -49,10 +53,12 @@ public class Player : MonoBehaviour
         _spriteRenderer = skin.GetComponent<SpriteRenderer>();
         _spriteTransform = skin.GetComponent<Transform>();
         _collider2D = GetComponent<Collider2D>();
+        _audioSource = GetComponent<AudioSource>();
         _score = 0;
         _superPacman = false;
         _startPostion = new Vector3(transform.position.x, transform.position.y, 0);
         speed = NormalSpeed;
+        _actualPointAudio = 0;
 
         if (godMode) _collider2D.enabled = false;
     }
@@ -97,6 +103,7 @@ public class Player : MonoBehaviour
             point.gameObject.SetActive(false);
             _score += point.Value;
             _eatenPoints += 1;
+            PlayPointsAudio();
         }
         else if (collision.CompareTag("Fruit"))
         {
@@ -104,6 +111,8 @@ public class Player : MonoBehaviour
             _score += _fruitPoints[fruit.ID];
             OnFruitEaten?.Invoke(fruit.ID);
             fruit.gameObject.SetActive(false);
+            _audioSource.clip = fruitAudio;
+            _audioSource.Play();
         }
     }
 
@@ -122,6 +131,9 @@ public class Player : MonoBehaviour
         {
             if (_superPacman)
             {
+                _audioSource.volume = 0.5f;
+                _audioSource.clip = ghostAudio;
+                _audioSource.Play();
                 _score += 100;
                 return;
             }
@@ -170,6 +182,14 @@ public class Player : MonoBehaviour
         Bounds playerBounds = directionCollider.bounds;
 
         return nodeBounds.Contains(playerBounds.min) && nodeBounds.Contains(playerBounds.max);
+    }
+
+    private void PlayPointsAudio()
+    {
+        _audioSource.volume = 0.2f;
+        _audioSource.clip = pointAudios[_actualPointAudio];
+        _audioSource.Play();
+        _actualPointAudio = _actualPointAudio == 0 ? 1 : 0;
     }
     
     #region PlayerMovement
