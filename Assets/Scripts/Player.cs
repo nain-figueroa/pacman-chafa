@@ -129,22 +129,30 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Ghost"))
         {
-            if (_superPacman)
+            Ghost ghost = other.gameObject.GetComponent<Ghost>();
+            
+            if (ghost.IsEaten()) return;
+            
+            if (_superPacman && ghost.IsFrightened())
             {
                 _audioSource.volume = 0.5f;
                 _audioSource.clip = ghostAudio;
                 _audioSource.Play();
                 _score += 100;
-                return;
             }
-            _lifes -= 1;
-            if (_lifes == 0)
+            else
             {
-                OnDied?.Invoke();
-                return;
+                _lifes -= 1;
+                if (_lifes == 0)
+                {
+                    OnDied?.Invoke();
+                }
+                else
+                {
+                    OnGhostCollision?.Invoke();
+                }
+                
             }
-            
-            OnGhostCollision?.Invoke();
         }
     }
     #endregion

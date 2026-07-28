@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private Player pacman;
     [SerializeField] private Fruit fruit;
     [SerializeField] private float superPacmanTime = 7f;
-    [SerializeField] private TextMeshProUGUI scoreText, hiScoreText;
+    [SerializeField] private TextMeshProUGUI scoreText, hiScoreText, pauseText;
     [SerializeField] private AnimationClip pacmanDeadAnimation;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip startAudio, ghostAudio, ghostFrightenedAudio, startDeadAudio, deadAudio;
@@ -26,6 +27,7 @@ public class GameController : MonoBehaviour
     private Coroutine _superPacmanTimer;
     private Point[] _pointsArray;
     private string _dataPath, _fullSavePath,_dataJson = "/gameData.json";
+    private bool _gamePaused;
 
     #region UnityMethods
 
@@ -49,6 +51,7 @@ public class GameController : MonoBehaviour
         pacman.OnFruitEaten += FruitEaten;
 
         _highScore = int.Parse(hiScoreText.text);
+        pauseText.gameObject.SetActive(false);
 
         _level = 1;
         _pointsArray = points.GetComponentsInChildren<Point>();
@@ -61,10 +64,20 @@ public class GameController : MonoBehaviour
         {
             fruitCounter.gameObject.SetActive(false);
         }
+
+        _gamePaused = false;
     }
 
     void Update()
     {
+        if (Keyboard.current.escapeKey.wasReleasedThisFrame)
+        {
+            _gamePaused = !_gamePaused;
+            AudioListener.pause = _gamePaused;
+            Time.timeScale = _gamePaused ? 0f : 1f;
+            pauseText.gameObject.SetActive(_gamePaused);
+        }
+        
         if (!audioSource.isPlaying && audioSource.clip == startAudio)
         {
             audioSource.clip = ghostAudio;
@@ -180,10 +193,10 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    private IEnumerator ChangeToGameOverScene()
+    private void ChangeToGameOverScene()
     {
         SaveData();
-        yield return new WaitForSeconds(pacmanDeadAnimation.length);
+        // yield return new WaitForSeconds(pacmanDeadAnimation.length);
         SceneManager.LoadScene("GameOver");
     }
     private IEnumerator ResetWorld()
@@ -206,20 +219,22 @@ public class GameController : MonoBehaviour
 
     private IEnumerator PacmanDiedAnimation(bool lastLife = false)
     {
+        audioSource.Stop();
         yield return PauseTime(1f);
         
         pacman.animator.SetBool("isDead", true);
         audioSource.PlayOneShot(deadAudio);
         
-        yield return StopEntitys(pacmanDeadAnimation.length + 1f);
-
+        yield return StopEntitys(pacmanDeadAnimation.length);
+        
         if (lastLife)
         {
-            StartCoroutine(ChangeToGameOverScene());
+            ChangeToGameOverScene();
         }
         else
         {
             ResetEntitys();
+            audioSource.Play();
         }
     }
     #endregion

@@ -299,6 +299,7 @@ MonoBehaviour:
   blinky: {fileID: 0}
   spriteRenderer: {fileID: 4091364704396705800}
   eyesSpriteRender: {fileID: 3725257880022982974}
+  physicCollider: {fileID: 9138452161788759787}
   cornerNodes: []
   eyes:
   - {fileID: -3140944659011227795, guid: 471bda71dbbae64c48efe654e06fd071, type: 3}

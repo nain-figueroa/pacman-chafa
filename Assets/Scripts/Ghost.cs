@@ -18,6 +18,7 @@ public class Ghost : MonoBehaviour
     [SerializeField] private GameObject nodes;
     [SerializeField] private Ghost blinky = null;
     [SerializeField] private SpriteRenderer spriteRenderer, eyesSpriteRender;
+    [SerializeField] private Collider2D physicCollider;
     [SerializeField] private List<Node> cornerNodes;
     [SerializeField] private List<Sprite> eyes;
 
@@ -25,7 +26,6 @@ public class Ghost : MonoBehaviour
     public float speed;
     
     private Rigidbody2D _rigidbody;
-    private Collider2D _physicCollider;
         
     private AStar _aStar = new AStar();
     private List<Node> _path = new();
@@ -56,7 +56,7 @@ public class Ghost : MonoBehaviour
         StartCoroutine(IdleState());
         
         _rigidbody = GetComponent<Rigidbody2D>();
-        _physicCollider = GetComponent<Collider2D>();
+        physicCollider = GetComponent<Collider2D>();
 
         _horizontalMov = Vector2.left;
         
@@ -80,7 +80,7 @@ public class Ghost : MonoBehaviour
         {
             if (_actualNode == startNode)
             {
-                _physicCollider.enabled = true;
+                physicCollider.enabled = true;
                 _state = GhostState.Idle;
                 GoToNormalSkin();
                 speed = NormalSpeed;
@@ -103,11 +103,11 @@ public class Ghost : MonoBehaviour
         if (other.gameObject.CompareTag("Player") && _state == GhostState.Frightened)
         {
             _state = GhostState.Eaten;
+            physicCollider.enabled = false;
 
             spriteRenderer.gameObject.SetActive(false);
             eyesSpriteRender.gameObject.SetActive(true);
             speed *= 4;
-            _physicCollider.enabled = false;
             StartCoroutine(PauseTime());
         }
     }
@@ -149,6 +149,19 @@ public class Ghost : MonoBehaviour
         animator.SetBool("superPacman", true);
         eyesSpriteRender.gameObject.SetActive(false);
         spriteRenderer.color = Color.white;
+    }
+
+    public bool IsFrightened()
+    {
+        if (_state == GhostState.Frightened) return true;
+        return false;
+    }
+
+    public bool IsEaten()
+    {
+        if (_state == GhostState.Eaten) return true;
+
+        return false;
     }
     private void CreatePath(Node start, Node destiny)
     {
