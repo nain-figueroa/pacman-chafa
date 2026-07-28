@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -208,6 +206,9 @@ public class Ghost : MonoBehaviour
 
     private void GoToNormalSkin()
     {
+        animator.SetBool("superPacman", false);
+        spriteRenderer.gameObject.SetActive(true);
+        eyesSpriteRender.gameObject.SetActive(true);
         switch (id)
         {
             case 'B':

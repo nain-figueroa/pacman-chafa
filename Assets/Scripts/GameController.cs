@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ public class GameController : MonoBehaviour
         _fullSavePath = _dataPath + _dataJson;
         if (!File.Exists(_fullSavePath))
         {
-            File.Create(_fullSavePath);
+            File.WriteAllText(_fullSavePath, "");
         }
         LoadData();
         hiScoreText.text = $"{_highScore}";
